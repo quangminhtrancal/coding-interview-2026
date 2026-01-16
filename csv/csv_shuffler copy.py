@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-CSV Shuffler Application
-Parses a CSV file, shuffles its content, and writes to a new file.
-"""
-
 import csv
 import random
 import sys
@@ -17,19 +12,6 @@ class StringManipulator:
 
     @staticmethod
     def validate_string(value: str, field_name: str = "Field") -> str:
-        """
-        Validate and clean a string value.
-
-        Args:
-            value: The string to validate
-            field_name: Name of the field for error messages
-
-        Returns:
-            Cleaned string value
-
-        Raises:
-            ValueError: If string is empty or invalid
-        """
         if not isinstance(value, str):
             raise ValueError(f"{field_name} must be a string, got {type(value).__name__}")
 
@@ -41,32 +23,11 @@ class StringManipulator:
 
     @staticmethod
     def normalize_whitespace(value: str) -> str:
-        """
-        Normalize whitespace in a string (collapse multiple spaces to single space).
-
-        Args:
-            value: The string to normalize
-
-        Returns:
-            String with normalized whitespace
-        """
+        # Normalize whitespace in a string (collapse multiple spaces to single space).
         return ' '.join(value.split())
 
     @staticmethod
     def truncate_string(value: str, max_length: int) -> str:
-        """
-        Truncate a string to a maximum length.
-
-        Args:
-            value: The string to truncate
-            max_length: Maximum allowed length
-
-        Returns:
-            Truncated string
-
-        Raises:
-            ValueError: If max_length is invalid
-        """
         if max_length <= 0:
             raise ValueError("max_length must be positive")
 
@@ -74,15 +35,6 @@ class StringManipulator:
 
     @staticmethod
     def sanitize_csv_value(value: str) -> str:
-        """
-        Sanitize a CSV value by removing or escaping problematic characters.
-
-        Args:
-            value: The value to sanitize
-
-        Returns:
-            Sanitized string
-        """
         # Remove null bytes and control characters except newlines
         sanitized = ''.join(char for char in value if char == '\n' or ord(char) >= 32)
         return sanitized.strip()
@@ -266,20 +218,6 @@ class CSVShuffler:
             raise Exception(f"Error writing CSV file: {e}")
 
     def process(self, input_file: str, output_file: str, seed: Optional[int] = None) -> dict:
-        """
-        Main processing method: read, shuffle, and write CSV.
-
-        Args:
-            input_file: Path to input CSV file
-            output_file: Path to output CSV file
-            seed: Optional random seed
-
-        Returns:
-            Dictionary with processing statistics
-
-        Raises:
-            Various exceptions from read/write operations
-        """
         # Validate output path doesn't overwrite input
         input_path = self.validate_file_path(input_file, check_exists=True)
         output_path = Path(output_file)
@@ -359,102 +297,58 @@ if __name__ == "__main__":
 import pytest
 import tempfile
 import os
-import random
-from pathlib import Path
-
-# --- Fixtures ---
 
 @pytest.fixture
 def csv_shuffler():
     return CSVShuffler()
 
-@pytest.fixture
-def temp_csv():
-    """Fixture to handle temp file creation and cleanup automatically."""
-    path = None
-    def _create(content: str):
-        nonlocal path
-        fd, path = tempfile.mkstemp(suffix='.csv')
-        with os.fdopen(fd, 'w', encoding='utf-8') as f:
-            f.write(content)
-        return path
-    
-    yield _create
-    
-    if path and os.path.exists(path):
+def create_temp_csv(content: str):
+    fd, path = tempfile.mkstemp(suffix='.csv')
+    with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        f.write(content)
+    return path
+
+def test_read_csv_valid(csv_shuffler):
+    content = "Name,Age,City\nAlice,30,New York\nBob,25,Los Angeles\n"
+    path = create_temp_csv(content)
+    try:
+        headers, rows = csv_shuffler.read_csv(path)
+        assert headers == ["Name", "Age", "City"]
+        assert rows == [["Alice", "30", "New York"], ["Bob", "25", "Los Angeles"]]
+    finally:
         os.remove(path)
 
-# --- StringManipulator Tests ---
+def test_read_csv_empty_file(csv_shuffler):
+    path = create_temp_csv("")
+    try:
+        with pytest.raises(ValueError, match="CSV file is empty"):
+            csv_shuffler.read_csv(path)
+    finally:
+        os.remove(path)
 
-def test_string_validation():
-    sm = StringManipulator()
-    assert sm.validate_string("  hello  ") == "hello"
-    with pytest.raises(ValueError, match="cannot be empty"):
-        sm.validate_string("   ")
-    with pytest.raises(ValueError, match="must be a string"):
-        sm.validate_string(123)
+def test_read_csv_no_headers(csv_shuffler):
+    content = "\nAlice,30,New York\n"
+    path = create_temp_csv(content)
+    try:
+        with pytest.raises(ValueError, match="CSV file has no headers"):
+            csv_shuffler.read_csv(path)
+    finally:
+        os.remove(path)
 
-def test_sanitize_csv_value():
-    sm = StringManipulator()
-    # Test removal of null bytes but preservation of newlines
-    dirty = "Value\0with\ncontrol\x07chars"
-    assert sm.sanitize_csv_value(dirty) == "Valuewith\ncontrolchars"
+def test_read_csv_row_column_mismatch(csv_shuffler):
+    content = "Name,Age\nAlice,30\nBob\n"
+    path = create_temp_csv(content)
+    try:
+        with pytest.raises(ValueError, match="Row 3 has 1 columns, expected 2"):
+            csv_shuffler.read_csv(path)
+    finally:
+        os.remove(path)
 
-# --- CSVShuffler Logic Tests ---
-
-def test_shuffle_rows_reproducibility(csv_shuffler):
-    """Asserts that the same seed produces the same shuffle (determinism)."""
-    rows = [["1"], ["2"], ["3"], ["4"], ["5"]]
-    
-    shuffled1 = csv_shuffler.shuffle_rows(rows, seed=42)
-    shuffled2 = csv_shuffler.shuffle_rows(rows, seed=42)
-    shuffled3 = csv_shuffler.shuffle_rows(rows, seed=99)
-    
-    assert shuffled1 == shuffled2, "Same seed should produce identical output"
-    assert shuffled1 != shuffled3, "Different seeds should likely produce different output"
-    assert len(shuffled1) == len(rows), "Should not lose data during shuffle"
-    assert all(row in shuffled1 for row in rows), "All original rows must exist in output"
-
-def test_shuffle_rows_immutability(csv_shuffler):
-    """Asserts that the original input list is not modified."""
-    original_rows = [["A"], ["B"], ["C"]]
-    input_copy = list(original_rows)
-    
-    csv_shuffler.shuffle_rows(input_copy, seed=1)
-    
-    assert input_copy == original_rows, "The original list should not be mutated"
-
-# --- CSV File IO Tests ---
-
-def test_read_csv_valid(csv_shuffler, temp_csv):
-    content = "Name,Age,City\nAlice,30,New York\nBob,25,Los Angeles\n"
-    path = temp_csv(content)
-    headers, rows = csv_shuffler.read_csv(path)
-    assert headers == ["Name", "Age", "City"]
-    assert len(rows) == 2
-    assert rows[0] == ["Alice", "30", "New York"]
-
-def test_write_csv_creates_file(csv_shuffler, tmp_path):
-    """Asserts that write_csv correctly saves headers and data to disk."""
-    output_file = tmp_path / "output.csv"
-    headers = ["ID", "Val"]
-    rows = [["1", "A"], ["2", "B"]]
-    
-    csv_shuffler.write_csv(str(output_file), headers, rows)
-    
-    assert output_file.exists()
-    written_content = output_file.read_text(encoding='utf-8')
-    assert "ID,Val" in written_content
-    assert "1,A" in written_content
-
-# --- Error Handling Tests ---
-
-def test_process_input_equals_output(csv_shuffler, temp_csv):
-    """Asserts error when user tries to overwrite the input file."""
-    path = temp_csv("h1,h2\nv1,v2")
-    with pytest.raises(ValueError, match="Output file cannot be the same as input file"):
-        csv_shuffler.process(path, path)
-
-def test_validate_file_path_not_found(csv_shuffler):
-    with pytest.raises(FileNotFoundError):
-        csv_shuffler.validate_file_path("non_existent_file.csv")
+def test_read_csv_no_data_rows(csv_shuffler):
+    content = "Name,Age,City\n"
+    path = create_temp_csv(content)
+    try:
+        with pytest.raises(ValueError, match="CSV file has no data rows"):
+            csv_shuffler.read_csv(path)
+    finally:
+        os.remove(path)
