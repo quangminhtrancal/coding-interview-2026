@@ -1,0 +1,7 @@
+# CSV Shuffler - Python Requirements
+# No external dependencies required - uses only Python standard library
+# Python 3.8+ required for type hints
+
+# For development and testing (optional)
+# pytest>=7.0.0
+# coverage>=6.0
