@@ -1,4 +1,27 @@
 '''
+
+Questions from: https://prachub.com/interview-questions/implement-an-in-memory-database-with-ttl-and-backup
+
+QUESTION 1 (Level 1): Implement basic CRUD operations
+- set(key, field, value): Insert or overwrite field-value pair for a key
+- get(key, field) -> string: Return value or "" if absent
+- delete(key, field) -> bool: Remove field, return true if deleted
+
+QUESTION 2 (Level 2): Implement read-only listing operations
+- scan(key) -> list[string]: Return all fields as "field(value)" sorted lexicographically
+- scan_by_prefix(key, prefix) -> list[string]: Return only fields starting with prefix
+
+QUESTION 3 (Level 3): Add timestamped operations with TTL support
+- set_at(key, field, value, timestamp): Set with timestamp
+- set_at_with_ttl(key, field, value, timestamp, ttl): Set with expiration [timestamp, timestamp+ttl)
+- get_at, delete_at, scan_at, scan_by_prefix_at: Timestamped variants that respect TTL
+- TTL semantics: Fields expire when timestamp >= timestamp_created + ttl
+
+QUESTION 4 (Level 4): Implement backup and restore with TTL recalculation
+- backup(timestamp): Save snapshot with remaining TTL for each field
+- restore(now, timestamp_to_restore): Restore from latest backup <= timestamp_to_restore
+  and recalculate expiry times based on remaining TTL at 'now'
+
 ========================
 https://www.reddit.com/r/leetcode/comments/1lb1him/comment/myec2eo/?force-legacy-sct=1
 
@@ -118,9 +141,21 @@ Your implementation should correctly handle overwrites, deletions, scans, TTL ex
 #### GEMINI solution below ####
 import collections
 
+
+class FieldRecord:
+    def __init__(self, value, expiry):
+        self.value = value
+        self.expiry = expiry
+
+    def is_valid(self, timestamp):
+        return timestamp < self.expiry
+
+    def remaining_ttl(self, timestamp):
+        return self.expiry - timestamp
+
 class InMemoryDatabase:
     def __init__(self):
-        # Data structure: { key: { field: { 'value': str, 'expiry': int_or_none } } }
+        # Data structure: { key: { field: FieldRecord } }
         self.db = collections.defaultdict(dict)
         # Backups: { backup_timestamp: deep_copy_of_db_state }
         self.backups = {}
@@ -129,17 +164,37 @@ class InMemoryDatabase:
     
     def set_at(self, key, field, value, timestamp, ttl=None):
         expiry = (timestamp + ttl) if ttl is not None else float('inf')
-        self.db[key][field] = {'value': value, 'expiry': expiry}
+        self.db[key][field] = FieldRecord(value, expiry)
         return "OK"
+
+    def set_and_compare(self, key, field, value, timestamp, expected_value):
+        if key in self.db and field in self.db[key]:
+            record = self.db[key][field]
+            if record.is_valid(timestamp):
+                if record.value != expected_value:
+                    return False
+                
+        self.set_at(key, field, value, timestamp)
+        return True
+
+    def set_at_with_ttl(self, key, field, value, timestamp, ttl):
+        return self.set_at(key, field, value, timestamp, ttl)
+
+    def set_and_compare_with_ttl(self, key, field, value, timestamp, expected_value, ttl):
+        if key in self.db and field in self.db[key]:
+            record = self.db[key][field]
+            if record.is_valid(timestamp):
+                if record.value != expected_value:
+                    return False
+        self.set_at_with_ttl(key, field, value, timestamp, ttl)
+        return True
 
     def get_at(self, key, field, timestamp):
         if key not in self.db or field not in self.db[key]:
             return ""
-        
         record = self.db[key][field]
-        if timestamp < record['expiry']:
-            return record['value']
-		
+        if record.is_valid(timestamp):
+            return record.value
         # Lazy cleanup (optional, but good for memory)
         # del self.db[key][field]
         return ""
@@ -147,7 +202,7 @@ class InMemoryDatabase:
     def delete_at(self, key, field, timestamp):
         if key in self.db and field in self.db[key]:
             record = self.db[key][field]
-            if timestamp < record['expiry']:
+            if record.is_valid(timestamp):
                 del self.db[key][field]
                 return True
         return False
@@ -160,17 +215,14 @@ class InMemoryDatabase:
     def scan_by_prefix_at(self, key, prefix, timestamp):
         if key not in self.db:
             return []
-        
         results = []
         # Sort fields lexicographically
         sorted_fields = sorted(self.db[key].keys())
-        
         for field in sorted_fields:
             if field.startswith(prefix):
                 record = self.db[key][field]
-                if timestamp < record['expiry']:
-                    results.append(f"{field}({record['value']})")
-                    
+                if record.is_valid(timestamp):
+                    results.append(f"{field}({record.value})")
         return results
 
     # --- Level 4: Backup and Restore ---
@@ -181,16 +233,15 @@ class InMemoryDatabase:
         for key, fields in self.db.items():
             key_snapshot = {}
             for field, record in fields.items():
-                if timestamp < record['expiry']:
+                if record.is_valid(timestamp):
                     # Store remaining TTL: expiry - backup_time
-                    remaining_ttl = record['expiry'] - timestamp
+                    remaining_ttl = record.remaining_ttl(timestamp)
                     key_snapshot[field] = {
-                        'value': record['value'],
+                        'value': record.value,
                         'remaining_ttl': remaining_ttl
                     }
             if key_snapshot:
                 snapshot[key] = key_snapshot
-        
         self.backups[timestamp] = snapshot
         return len(snapshot) # Often returns count of keys or fields
 
@@ -199,21 +250,15 @@ class InMemoryDatabase:
         available_backups = [t for t in self.backups if t <= timestamp_to_restore]
         if not available_backups:
             return False
-        
         latest_backup_ts = max(available_backups)
         snapshot = self.backups[latest_backup_ts]
-        
         # Reset DB state
         self.db = collections.defaultdict(dict)
-        
         # Recalculate expiry based on 'now'
         for key, fields in snapshot.items():
             for field, data in fields.items():
                 new_expiry = now + data['remaining_ttl']
-                self.db[key][field] = {
-                    'value': data['value'],
-                    'expiry': new_expiry
-                }
+                self.db[key][field] = FieldRecord(data['value'], new_expiry)
         return True
 	
 def run_tests():
@@ -253,182 +298,6 @@ def run_tests():
     # user2.temp had 5s left at backup, so it should expire at 40 + 5 = 45
     print("Temp at T44:", db.get_at("user2", "temp", 44))        # "val"
     print("Temp at T46:", db.get_at("user2", "temp", 46))        # "" (Expired)
-
-### Claude solution below ###
-
-"""
-Questions from: https://prachub.com/interview-questions/implement-an-in-memory-database-with-ttl-and-backup
-
-QUESTION 1 (Level 1): Implement basic CRUD operations
-- set(key, field, value): Insert or overwrite field-value pair for a key
-- get(key, field) -> string: Return value or "" if absent
-- delete(key, field) -> bool: Remove field, return true if deleted
-
-QUESTION 2 (Level 2): Implement read-only listing operations
-- scan(key) -> list[string]: Return all fields as "field(value)" sorted lexicographically
-- scan_by_prefix(key, prefix) -> list[string]: Return only fields starting with prefix
-
-QUESTION 3 (Level 3): Add timestamped operations with TTL support
-- set_at(key, field, value, timestamp): Set with timestamp
-- set_at_with_ttl(key, field, value, timestamp, ttl): Set with expiration [timestamp, timestamp+ttl)
-- get_at, delete_at, scan_at, scan_by_prefix_at: Timestamped variants that respect TTL
-- TTL semantics: Fields expire when timestamp >= timestamp_created + ttl
-
-QUESTION 4 (Level 4): Implement backup and restore with TTL recalculation
-- backup(timestamp): Save snapshot with remaining TTL for each field
-- restore(now, timestamp_to_restore): Restore from latest backup <= timestamp_to_restore
-  and recalculate expiry times based on remaining TTL at 'now'
-"""
-
-class InMemoryDatabaseClaude:
-    def __init__(self):
-        # Structure: { key: { field: {'value': str, 'expiry': float} } }
-        self.data = {}
-        # Backups: { backup_time: snapshot_dict }
-        self.backups = {}
-
-    # ========== LEVEL 1: Basic CRUD ==========
-
-    def set(self, key, field, value):
-        """Set field-value pair for key (no timestamp, no TTL)."""
-        if key not in self.data:
-            self.data[key] = {}
-        self.data[key][field] = {'value': value, 'expiry': float('inf')}
-
-    def get(self, key, field):
-        """Get value for field in key, return empty string if not found."""
-        if key not in self.data or field not in self.data[key]:
-            return ""
-        return self.data[key][field]['value']
-
-    def delete(self, key, field):
-        """Delete field from key, return True if deleted, False otherwise."""
-        if key in self.data and field in self.data[key]:
-            del self.data[key][field]
-            if not self.data[key]:  # Clean up empty keys
-                del self.data[key]
-            return True
-        return False
-
-    # ========== LEVEL 2: Scanning ==========
-
-    def scan(self, key):
-        """Return all fields as 'field(value)' sorted lexicographically."""
-        if key not in self.data:
-            return []
-
-        fields = sorted(self.data[key].keys())
-        return [f"{field}({self.data[key][field]['value']})" for field in fields]
-
-    def scan_by_prefix(self, key, prefix):
-        """Return fields starting with prefix as 'field(value)' sorted."""
-        if key not in self.data:
-            return []
-
-        fields = sorted([f for f in self.data[key].keys() if f.startswith(prefix)])
-        return [f"{field}({self.data[key][field]['value']})" for field in fields]
-
-    # ========== LEVEL 3: Timestamped Operations + TTL ==========
-
-    def set_at(self, key, field, value, timestamp):
-        """Set field-value pair at given timestamp (no TTL)."""
-        if key not in self.data:
-            self.data[key] = {}
-        self.data[key][field] = {'value': value, 'expiry': float('inf')}
-
-    def set_at_with_ttl(self, key, field, value, timestamp, ttl):
-        """Set field-value pair with TTL. Valid in [timestamp, timestamp+ttl)."""
-        if key not in self.data:
-            self.data[key] = {}
-        expiry = timestamp + ttl
-        self.data[key][field] = {'value': value, 'expiry': expiry}
-
-    def get_at(self, key, field, timestamp):
-        """Get value at timestamp, respecting TTL. Return empty string if expired/absent."""
-        if key not in self.data or field not in self.data[key]:
-            return ""
-
-        record = self.data[key][field]
-        if timestamp < record['expiry']:
-            return record['value']
-        return ""
-
-    def delete_at(self, key, field, timestamp):
-        """Delete field at timestamp if not expired. Return True if deleted."""
-        if key in self.data and field in self.data[key]:
-            record = self.data[key][field]
-            if timestamp < record['expiry']:
-                del self.data[key][field]
-                if not self.data[key]:
-                    del self.data[key]
-                return True
-        return False
-
-    def scan_at(self, key, timestamp):
-        """Scan all non-expired fields at given timestamp."""
-        return self.scan_by_prefix_at(key, "", timestamp)
-
-    def scan_by_prefix_at(self, key, prefix, timestamp):
-        """Scan fields with prefix, only non-expired ones at given timestamp."""
-        if key not in self.data:
-            return []
-
-        result = []
-        for field in sorted(self.data[key].keys()):
-            if field.startswith(prefix):
-                record = self.data[key][field]
-                if timestamp < record['expiry']:
-                    result.append(f"{field}({record['value']})")
-        return result
-
-    # ========== LEVEL 4: Backup and Restore ==========
-
-    def backup(self, timestamp):
-        """Create snapshot of all non-expired fields at timestamp, storing remaining TTL."""
-        snapshot = {}
-
-        for key, fields in self.data.items():
-            key_snapshot = {}
-            for field, record in fields.items():
-                # Only backup non-expired fields
-                if timestamp < record['expiry']:
-                    # Calculate remaining TTL at backup time
-                    remaining_ttl = record['expiry'] - timestamp
-                    key_snapshot[field] = {
-                        'value': record['value'],
-                        'remaining_ttl': remaining_ttl
-                    }
-            if key_snapshot:
-                snapshot[key] = key_snapshot
-
-        self.backups[timestamp] = snapshot
-        return True
-
-    def restore(self, now, timestamp_to_restore):
-        """Restore from latest backup <= timestamp_to_restore, recalculate TTL from 'now'."""
-        # Find latest backup at or before timestamp_to_restore
-        valid_backups = [t for t in self.backups.keys() if t <= timestamp_to_restore]
-
-        if not valid_backups:
-            return False
-
-        backup_time = max(valid_backups)
-        snapshot = self.backups[backup_time]
-
-        # Clear current data and restore from snapshot
-        self.data = {}
-
-        for key, fields in snapshot.items():
-            self.data[key] = {}
-            for field, data in fields.items():
-                # Recalculate expiry: now + remaining_ttl_from_backup
-                new_expiry = now + data['remaining_ttl']
-                self.data[key][field] = {
-                    'value': data['value'],
-                    'expiry': new_expiry
-                }
-
-        return True
 
 
 def test_claude_solution():

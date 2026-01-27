@@ -7,12 +7,16 @@ Design a data structure/class that supports these operations:
 
 addCredit(timestamp, amount)
 Records that amount credits were added at time timestamp .
+
 chargeCredit(timestamp, amount)
 Records that amount credits were requested to be charged at time timestamp .
+
 getBalance(timestamp) -> integer
 Returns the effective balance at time timestamp , computed using all recorded requests whose timestamps are <= timestamp .
+
 Rules for computing the effective balance
-When computing the balance at time T, consider all recorded addCredit and chargeCredit events with timestamp <= T and process them in increasing timestamp order.
+When computing the balance at time T, consider all recorded addCredit and chargeCredit events 
+with timestamp <= T and process them in increasing timestamp order.
 
 Start from balance 0 .
 For an addCredit , increase the balance.
@@ -30,5 +34,4 @@ There is no strict time complexity requirement ; correctness is the priority.
 Deliverable
 Provide the API and implement the logic so that repeated calls to getBalance(T) always return the correct value according to the rules above.
 '''
-
 
