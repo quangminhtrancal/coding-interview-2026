@@ -5,6 +5,24 @@ from typing import List, Set, Dict
 a = [['z', 1, 3], ['t', 9, 9], ['a', 10, 10]]
 a.sort(key=lambda x: x[0])
 
+# ========= find and rfind return -1 if not find ||| and index raise ValueError ==========
+>>> a = '/a/b/c'
+>>> a.find('/')
+0
+>>> a.rfind('/')
+4
+>>> a.index('/')
+0
+>>> a.rindex('/')
+4
+>>> a.index('-')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: substring not found
+
+
+values.sort(reverse=True)
+
 # Sort by size (desc), then by name (asc)
 matching_files.sort(key=lambda x: (-x[1], x[0]))
 
@@ -116,6 +134,7 @@ if idx >= 0:
 from collections import defaultdict
 monthly_card_payments = defaultdict(lambda: {'count': 0, 'total': 0})
 monthly_card_payments = defaultdict(dict)
+defaultdict(int); defaultdict(list); defaultdict(set)
 
 '''
 defaultdict(dict) creates an empty dictionary {} for any missing key.

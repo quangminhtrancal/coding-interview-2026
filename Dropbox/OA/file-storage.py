@@ -304,14 +304,5 @@ class CloudStorage:
             self.users[to_user]['used'] += file_info['size']
             file_info['user_id'] = to_user
 
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     run_tests()
