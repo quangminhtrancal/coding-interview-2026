@@ -1,0 +1,27 @@
+Infra structure ic3
+
+Python
+
+split 2 days:
+- day1:
+      3 hrs:
+      2 live coding :
+          come up with working solution: clean and debuggable
+          concurrency, multi threading
+          system design
+          abstraction
+          craft coding
+      1 deepdive:
+          something in amazon: show case seniority -> dictate level
+          [how long, actual implication]
+
+
+[ deep dive: 1 or 2 sentences for ]
+- day2:
+  - architect:
+        tradeoff, design discussion, participate in design 
+  - all around:
+           behavior interview
+           mentorship responsibility + collaboration + code influencing + deep dive in project [can be same story]
+           AI usage => ai tool
+        - question for hiring manager: Sabrina shares about the manager

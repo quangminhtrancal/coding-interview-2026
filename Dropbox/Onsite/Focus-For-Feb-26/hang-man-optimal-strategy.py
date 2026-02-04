@@ -1,7 +1,13 @@
 '''
 https://www.1point3acres.com/interview/problems/03d208eb-7407-4966-b8c0-0f063d5fa252
 
-Design a program to play a hangman game. In this game, there are two players; Player 1 guesses letters and Player 2 chooses a word. If both players use optimal strategies, design an algorithm that will allow Player 1 to always find the optimal solution. Given a list of words, develop an algorithm to output the sequence of letter guesses that minimizes the number of incorrect guesses. Provide multiple test cases to validate your algorithm.
+Design a program to play a hangman game. In this game, there are two players; 
+Player 1 guesses letters and Player 2 chooses a word. 
+If both players use optimal strategies, design an algorithm that will allow Player 1 to 
+always find the optimal solution. 
+
+Given a list of words, develop an algorithm to output the sequence of letter guesses 
+that minimizes the number of incorrect guesses. Provide multiple test cases to validate your algorithm.
 
 
 PROBLEM ANALYSIS:

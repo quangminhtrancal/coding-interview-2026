@@ -1,7 +1,8 @@
 '''
 https://www.1point3acres.com/interview/problems/066f3b72-1a40-4fca-8001-eecd1ddc3565
 
-Given a dictionary, a secret word, and a guessed word, your task is to provide feedback based on these inputs. The feedback rule is as follows:
+Given a dictionary, a secret word, and a guessed word, your task is to provide feedback based on these inputs. 
+The feedback rule is as follows:
 
 For each letter, if it exists in the same position in the secret word, return 'match'.
 If the letter exists in the secret word but in a different position, return 'exists'.
@@ -25,8 +26,10 @@ banana
 cherry
 date
 eagle
-pearl
-piano
+
+pearl: secret word
+
+piano: guessed word
 Sample Output:
 
 ['not exists', 'exists', 'match', 'exists', 'not exists']
