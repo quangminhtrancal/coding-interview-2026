@@ -1,7 +1,10 @@
 '''
 https://www.1point3acres.com/interview/problems/374ea0b3-6ad5-4d15-a6a4-bfd7a92db739
 
-Given a grid with a starting point at (0, 0) and an endpoint at (n-1, m-1). There are four types of walking methods A, B, C, D, each with a fixed time and cost per cell. Find the shortest time path from the start to the end using only one walking method throughout. If there are multiple paths with the same time, choose the one with the least cost.
+Given a grid with a starting point at (0, 0) and an endpoint at (n-1, m-1). 
+There are four types of walking methods A, B, C, D, each with a fixed time and cost per cell. 
+Find the shortest time path from the start to the end using only one walking method throughout. 
+If there are multiple paths with the same time, choose the one with the least cost.
 
 Input:
 

@@ -1,5 +1,6 @@
 '''
 https://leetcode.com/discuss/post/6611648/2874-maximum-value-of-an-ordered-triplet-5fsn/
+https://leetcode.com/problems/maximum-value-of-an-ordered-triplet-ii/description/
 Maximum Value of an Ordered Triplet II
 
 Approach & Explanation:

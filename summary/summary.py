@@ -141,3 +141,110 @@ defaultdict(dict) creates an empty dictionary {} for any missing key.
 defaultdict(lambda: {'count': 0, 'total': 0}) creates a dictionary with specific initial values: 
 {'count': 0, 'total': 0} for any missing key.
 '''
+
+# using match, case
+
+def http_error(status):
+    match status:
+        case 400:
+            return "Bad request"
+        case 404:
+            return "Not found"
+        case 418:
+            return "I'm a teapot"
+        case _: # Default case
+            return "Something's wrong with the internet"
+
+# example try except
+
+try:
+    a = 1/ 0
+except Error:
+    raise Error('wrong dividision')
+
+
+# using enum
+from enum import Enum
+class MachineStatus(Enum):
+    START = 0
+    STOP = 1
+    RUNNING = 2
+
+MachineStatus.START
+
+# reverse string
+>>> s = '12345'
+>>> a = s[::-1]
+>>> type(a)
+<class 'str'>
+>>> a = '54321'
+
+
+left_max = [0] * n # will create [0, 0, ..., 0] (n times)  => not 0 * [n]
+
+
+from copy import deepcopy
+
+###                                Queue thread safe
+import threading
+import queue
+
+# 1. Initialize the thread-safe Queue
+# maxsize=0 means infinite; setting a limit helps prevent memory overflow
+task_queue = queue.Queue(maxsize=50)
+task_queue.qsize()  # Check current size of the queue
+task_queue.put((101, ["apple", "apply", "banas"], "a"))  # Add a task to the queue
+task_queue.get()  # Retrieve a task from the queue (blocking if empty)
+task_queue.task_done()  # Signal that a retrieved task is complete
+
+def evil_partition_worker():
+    """Worker thread logic that processes guessing tasks."""
+    while True:
+        # get() is thread-safe and blocking by default
+        task = task_queue.get()
+        
+        if task is None: # The "Poison Pill" to shut down threads
+            task_queue.task_done()
+            break
+            
+        user_id, word_list, guess = task
+        print(f"[Worker] Processing guess '{guess}' for User {user_id}")
+        
+        # --- Insert your Evil Hangman partitioning logic here ---
+        # (The logic we wrote in the previous step)
+        
+        # Signal that the job is finished
+        task_queue.task_done()
+
+# 2. Spawning a pool of workers
+for i in range(3):
+    t = threading.Thread(target=evil_partition_worker, daemon=True)
+    t.start()
+
+# 3. Simulating incoming API requests
+mock_requests = [
+    (101, ["apple", "apply", "banas"], "a"),
+    (102, ["deer", "beer", "dish"], "e")
+]
+
+for req in mock_requests:
+    task_queue.put(req)
+
+# Block until all tasks are processed
+task_queue.join()
+print("All partitions calculated.")
+
+
+import re
+
+text = "1.txt(abcd)"
+pattern = r"(.+)\((.*)\)"
+
+match = re.search(pattern, text)
+
+if match:
+    filename = match.group(1) # Everything before the first "("
+    content = match.group(2)  # Everything inside the "()"
+    
+    print(f"Filename: {filename}")
+    print(f"Content:  {content}")

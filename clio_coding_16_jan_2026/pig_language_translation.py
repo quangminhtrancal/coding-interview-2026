@@ -75,6 +75,13 @@ r'[a-zA-Z]+' — Matches one or more ASCII letters.
 \\. — Matches a literal dot (or any special character).
 Example Use Cases:
 
+.* : Match anything.
+
+\s : Match a space.
+
+\d : Match a digit (number).
+
+
 Split by words and punctuation: re.findall(r'\w+|\W+', text)
 Find all words: re.findall(r'\b\w+\b', text)
 Remove punctuation: re.sub(r'[^\w\s]', '', text)

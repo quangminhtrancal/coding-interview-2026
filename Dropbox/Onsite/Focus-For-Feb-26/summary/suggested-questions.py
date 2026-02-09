@@ -289,11 +289,13 @@ class RWLock:
 
 '''
 Key Terms to Drop During the Interview:
-GIL (Global Interpreter Lock): Since you're using Python, mention that threading is good for I/O bound tasks (like crawling), but for CPU-bound tasks in Python, you'd need multiprocessing to bypass the GIL.
+GIL (Global Interpreter Lock): Since you're using Python, mention that threading is good for I/O bound tasks (like crawling), 
+but for CPU-bound tasks in Python, you'd need multiprocessing to bypass the GIL.
 
 Race Conditions: Always identify which shared variable needs a lock (e.g., the visited set or the queue length).
 
 Deadlock Prevention: If you use multiple locks, explain that you always acquire them in a consistent order.
 
-Would you like me to explain how to handle "Writer Starvation" in the Reader-Writer lock, or should we look at a System Design problem like "Designing a Globally Distributed File Watcher"?
+Would you like me to explain how to handle "Writer Starvation" in the Reader-Writer lock, 
+or should we look at a System Design problem like "Designing a Globally Distributed File Watcher"?
 '''

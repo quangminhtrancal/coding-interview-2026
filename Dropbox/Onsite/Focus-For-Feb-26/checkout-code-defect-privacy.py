@@ -1,8 +1,39 @@
 '''
 Data sienctist interview question
-"content_raw": "You are reviewing a supermarket checkout implementation. Identify and prioritize issues and fixes across: (a) monetary correctness (avoid floating point; tax/discount rounding rules; coupon stacking; price overrides; refunds/voids; currency/locale/time-zone edge cases), (b) transactional integrity (idempotent payments, exactly-once order creation, inventory race conditions, TOCTOU on discounts), (c) security/privacy (PCI scope reduction, tokenization, PII redaction in logs, least-privilege DB access, input validation to prevent injection), and (d) resilience/observability (retry/backoff, dead-letter queues, audit trails). Propose concrete refactors, unit/integration tests, and a minimal threat model. Provide a short code review checklist you would use in 30 minutes and 3 high-risk bugs you would hunt first.",
+"content_raw": "You are reviewing a supermarket checkout implementation. 
+Identify and prioritize issues and fixes across: 
+
+(a) monetary correctness (avoid floating point; tax/discount rounding rules; 
+coupon stacking; price overrides; refunds/voids; currency/locale/time-zone edge cases), 
+
+(b) transactional integrity (idempotent payments, exactly-once order creation, 
+inventory race conditions, TOCTOU on discounts), 
+
+(c) security/privacy (PCI scope reduction, tokenization, PII redaction in logs, 
+least-privilege DB access, input validation to prevent injection), and (
+
+d) resilience/observability (retry/backoff, dead-letter queues, audit trails). 
+Propose concrete refactors, unit/integration tests, 
+and a minimal threat model. Provide a short code 
+review checklist you would use in 30 minutes and 3 high-risk bugs you would hunt first.",
+
 https://prachub.com/interview-questions/review-checkout-code-for-defects-and-privacy
 
-You are reviewing a supermarket checkout implementation. Identify and prioritize issues and fixes across: (a) monetary correctness (avoid floating point; tax/discount rounding rules; coupon stacking; price overrides; refunds/voids; currency/locale/time-zone edge cases), (b) transactional integrity (idempotent payments, exactly-once order creation, inventory race conditions, TOCTOU on discounts), (c) security/privacy (PCI scope reduction, tokenization, PII redaction in logs, least-privilege DB access, input validation to prevent injection), and (d) resilience/observability (retry/backoff, dead-letter queues, audit trails). Propose concrete refactors, unit/integration tests, and a minimal threat model. Provide a short code review checklist you would use in 30 minutes and 3 high-risk bugs you would hunt first.
+You are reviewing a supermarket checkout implementation. 
+Identify and prioritize issues and fixes across: 
+(a) monetary correctness 
+(avoid floating point; tax/discount rounding rules; coupon stacking; price overrides; 
+refunds/voids; currency/locale/time-zone edge cases), 
+
+(b) transactional integrity (idempotent payments, exactly-once order creation, 
+inventory race conditions, TOCTOU on discounts), (
+
+c) security/privacy (PCI scope reduction, tokenization, PII redaction in logs, l
+east-privilege DB access, input validation to prevent injection), and 
+
+(d) resilience/observability (retry/backoff, dead-letter queues, audit trails). 
+Propose concrete refactors, unit/integration tests, and a minimal threat model. 
+Provide a short code review checklist you would use in 30 minutes and 3 high-risk 
+bugs you would hunt first.
 
 '''

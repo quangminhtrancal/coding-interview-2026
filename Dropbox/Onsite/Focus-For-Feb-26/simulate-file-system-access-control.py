@@ -2,11 +2,14 @@
 https://www.1point3acres.com/interview/problems/f0867d5b-4d3f-4ff4-9af3-0c7f8b8160ca
 
 Problem Description
-Given a file system represented as a List<List<string>> folders and a HashSet<string> accesses, implement a function HasAccess(string folder) to determine if a user has access to a specified folder. Access rights are inherited, meaning if a user can access a parent folder, they can also access the child folder.
+Given a file system represented as a List<List<string>> folders and a HashSet<string> accesses, 
+implement a function HasAccess(string folder) to determine if a user has access to a specified folder. 
+Access rights are inherited, meaning if a user can access a parent folder, they can also access the child folder.
 
 Input:
 
-folders: A hierarchical structure representation of the file system, where each list describes a parent-child relationship. Example: [['A', 'B'], ['B', 'C'], ['B', 'D'], ['A', 'E'], ['E', 'F']] means /A has directories /B and /E, /B contains /C and /D, and /E contains /F.
+folders: A hierarchical structure representation of the file system, where each list describes a parent-child relationship. 
+Example: [['A', 'B'], ['B', 'C'], ['B', 'D'], ['A', 'E'], ['E', 'F']] means /A has directories /B and /E, /B contains /C and /D, and /E contains /F.
 accesses: An initial set of folders the user has access to. Example: {'A'}
 Output:
 

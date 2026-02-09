@@ -1,14 +1,6 @@
 '''
 "posts": [
         {
-            "ai_comments_count": 0,
-            "ai_likes_count": 0,
-            "author": "admin",
-            "categories": [],
-            "category": "Coding & Algorithms",
-            "category_raw": "Coding & Algorithms",
-            "comments": [],
-            "comments_count": 0,
             "company": "Karat",
             "content": "神奇的店面，不好分类，希望能被人看到。。。\n烙印，经典亚马逊客服低质麦克风。已经和烙印工作多年的我仍然只听得懂50%。但好在对方也察觉到了，于是我委婉的希望对方讲慢一点，改善了很多。\n上来说了不要求你做完所有题目。只有一个code pad，我用java做的，纯靠main跑。\n第一题，输入是一个密码，需要判断密码是否合规，列出违反的规则。\n长度大于15\n不能包含“密码”，不区分大小写\n必须有一个大写一个小写\n必须包含三个特殊符号中的一个\n同一字符不能超过四个\n第二题：三个table，均以2D string array形式出现。然后进行match和join。\n有顾客表：名字，邮箱，商品名，购买数量 （一个用户只买一种商品）\n订单表：用户id，邮箱，订单总金额 （邮箱可以是null）\n商品表：商品名，单价。\n需要找出用户id到名字的mapping。\n面试官除了给题目以外一点用没有。\n求米🙏🙏🙏🙏🙏🙏🙏🙏🙏🙏",
             "content_enhanced": "## Problem\nYou are given three tables represented as **2D string arrays** (each row is a record, no headers). You need to produce a mapping from **`userId` → `customerName`** by matching and joining information across tables.\n\n### Table 1: `customers`\nEach row: `[customerName, email, productName, quantity]`\n- `quantity` is an integer in string form.\n- Assumption: **each customer buys only one type of product** (i.e., one `productName` per customer).\n\n### Table 2: `orders`\nEach row: `[userId, email, orderTotal]`\n- `orderTotal` is a number in string form (integer or decimal).\n- `email` **may be null** (or an empty string, depending on how the input is represented).\n\n### Table 3: `products`\nEach row: `[productName, unitPrice]`\n- `unitPrice` is a number in string form.\n\n## Matching / Join requirement\nFor each `order` record, identify which customer placed it, then output `userId -> customerName`.\n\nUse these matching rules:\n1. If `orders.email` is present (non-null/non-empty), match the customer by **email**.\n2. If `orders.email` is missing, match by using the fact that:\n   - `orderTotal = quantity * unitPrice` for the customer’s purchased product.\n   - Use `customers.productName` joined to `products.productName` to get `unitPrice`.\n\n## Output\nReturn a mapping/dictionary from `userId` to `customerName` for all orders.\n\n## Assumptions / Edge cases\n- If multiple customers could match an order (e.g., same computed total), specify and implement a deterministic tie-breaker (e.g., pick lexicographically smallest name) or return all candidates—clarify with the interviewer.\n- Assume inputs are well-formed aside from possible null/empty emails.\n",

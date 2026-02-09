@@ -6,7 +6,22 @@
   \"/A/B/D\",
   \"/A/E\",
   \"/F\"
-]\n```\n\n- A set of folder paths `accessibleFolders` representing folders to which the user has **direct** access. For example:\n\n```text\naccessibleFolders = { \"/A\", \"/F\" }\n```\n\nYou need to implement the function:\n\n```text\nbool HasAccess(string folderPath)\n```\n\nthat returns:\n\n- `true` if the user has access to `folderPath` **either** because:\n  - `folderPath` is in `accessibleFolders`, **or**\n  - some ancestor folder of `folderPath` (e.g., `/A` is an ancestor of `/A/B/C`) is in `accessibleFolders`.\n- `false` otherwise.\n\nAssume:\n\n- All folder paths in `allFolders` and `accessibleFolders` are normalized absolute paths starting with `'/'`, with components separated by `'/'` (e.g., `/A/B/C`).\n- `folderPath` passed into `HasAccess` is always a valid folder path present in `allFolders`.\n\nExamples (given the tree above and `accessibleFolders = {\"/A\", \"/F\"}`):\n\n- `HasAccess(\"/A\")` → `true` (direct access)\n- `HasAccess(\"/A/B\")` → `true` (inherits from `/A`)\n- `HasAccess(\"/A/B/C\")` → `true` (inherits from `/A`)\n- `HasAccess(\"/A/E\")` → `true` (inherits from `/A`)\n- `HasAccess(\"/F\")` → `true` (direct access)\n- `HasAccess(\"/\")` → `false` (no access to root unless `/` is in `accessibleFolders`)\n\nDesign and implement `HasAccess` so that it can be called many times efficiently after the initial inputs (`allFolders` and `accessibleFolders`) are known.",
+]\n```\n\n- A set of folder paths `accessibleFolders` representing folders to which the user has **direct** access. For example:\n\n
+```text\naccessibleFolders = { \"/A\", \"/F\" }\n```\n\nYou need to implement the function:\n\n```text\nbool HasAccess(string folderPath)\n
+```\n\nthat returns:\n\n- `true` if the user has access to `folderPath` **either** because:\n  
+- `folderPath` is in `accessibleFolders`, **or**\n  - some ancestor folder of `folderPath` 
+(e.g., `/A` is an ancestor of `/A/B/C`) is in `accessibleFolders`.\n- `false` otherwise.\n\nAssume:\n\n
+- All folder paths in `allFolders` and `accessibleFolders` are normalized absolute paths starting with `'/'`, 
+with components separated by `'/'` (e.g., `/A/B/C`).\n- `folderPath` passed into `HasAccess` is always a valid folder path present in `allFolders`.\n\n
+Examples (given the tree above and `accessibleFolders = {\"/A\", \"/F\"}`):\n\n
+
+- `HasAccess(\"/A\")` → `true` (direct access)\n
+- `HasAccess(\"/A/B\")` → `true` (inherits from `/A`)\n
+- `HasAccess(\"/A/B/C\")` → `true` (inherits from `/A`)\n
+- `HasAccess(\"/A/E\")` → `true` (inherits from `/A`)\n-
+ `HasAccess(\"/F\")` → `true` (direct access)\n- `HasAccess(\"/\")` → `false` (no access to root unless `/` is in `accessibleFolders`)\n\n
+ 
+ Design and implement `HasAccess` so that it can be called many times efficiently after the initial inputs (`allFolders` and `accessibleFolders`) are known.",
 
 https://prachub.com/interview-questions/implement-hierarchical-folder-access-check
 
@@ -63,7 +78,88 @@ Design and implement HasAccess so that it can be called many times efficiently a
 
 from typing import List, Set
 
+#### Gemini simple answer
 
+# Implementation 1: The "Lookup" Optimized ApproachThis is the most common and practical solution for a Dropbox-style interview. 
+# It uses $O(1)$ average time for set lookups and $O(L)$ time to traverse the path string (where $L$ is the depth of the folder).Python
+
+class FileAccessSystem:
+
+    def __init__(self, allFolders, accessibleFolders):
+        # We store accessibleFolders in a Set for O(1) lookup
+        # Optimization: We can "shrink" this set by removing redundant paths.
+        # (e.g., if we have "/A" and "/A/B", "/A/B" is redundant)
+        self.accessible = self._simplify_access(accessibleFolders)
+
+    def _simplify_access(self, folders):
+        # This pre-processing step makes the set smaller and lookups faster
+        sorted_folders = sorted(folders, key=len)
+        minimized = set()
+        for f in sorted_folders:
+            # Only add folder if none of its ancestors are already in minimized
+            if not self._check_ancestors(f, minimized):
+                minimized.add(f)
+        return minimized
+
+    def _check_ancestors(self, path, folder_set):
+        if path in folder_set:
+            return True
+        # Logic to climb up the tree
+        while path != "/":
+            # Strip the last part of the path (e.g., /A/B/C -> /A/B)
+            path = path.rsplit('/', 1)[0]
+            if not path: # Handle the root edge case after rsplit
+                path = "/"
+            if path in folder_set:
+                return True
+        return False
+
+    def HasAccess(self, folderPath: str) -> bool:
+        # Standard lookup: climb the path until we hit a match or the root
+        return self._check_ancestors(folderPath, self.accessible)
+
+
+#### Gemini trie
+
+class FolderNode:
+    def __init__(self):
+        self.children = {}
+        self.has_access = False
+
+class FileAccessTrie:
+    def __init__(self, allFolders, accessibleFolders):
+        self.root = FolderNode()
+        for path in accessibleFolders:
+            self.add_access(path)
+
+    def add_access(self, path):
+        node = self.root
+        if path == "/":
+            node.has_access = True
+            return
+        
+        parts = path.strip("/").split("/")
+        for part in parts:
+            if part not in node.children:
+                node.children[part] = FolderNode()
+            node = node.children[part]
+        node.has_access = True
+
+    def HasAccess(self, folderPath: str) -> bool:
+        node = self.root
+        if node.has_access: return True # Root access
+        
+        if folderPath == "/": return node.has_access
+        
+        parts = folderPath.strip("/").split("/")
+        for part in parts:
+            if part not in node.children:
+                return False # No more direct access markers found
+            node = node.children[part]
+            if node.has_access:
+                return True # Inherited access found!
+        return False
+    
 # ============================================================================
 # APPROACH 1: Simple Solution - Check Ancestors On-The-Fly
 # ============================================================================
@@ -331,181 +427,101 @@ class FileAccessChecker:
 # TESTS
 # ============================================================================
 
-def test_file_access_checker():
-    """Test all implementations with the provided examples."""
+'''
+https://www.1point3acres.com/interview/problems/f0867d5b-4d3f-4ff4-9af3-0c7f8b8160ca
 
-    # Test data from problem statement
-    all_folders = [
-        "/",
-        "/A",
-        "/A/B",
-        "/A/B/C",
-        "/A/B/D",
-        "/A/E",
-        "/F"
-    ]
+Problem Description
+Given a file system represented as a List<List<string>> folders and a HashSet<string> accesses, 
+implement a function HasAccess(string folder) to determine if a user has access to a specified folder. 
+Access rights are inherited, meaning if a user can access a parent folder, they can also access the child folder.
 
-    accessible_folders = {"/A", "/F"}
+Input:
 
-    # Test all implementations
-    implementations = [
-        ("Simple", FileAccessChecker_Simple),
-        ("Optimized", FileAccessChecker_Optimized),
-        ("Trie", FileAccessChecker_Trie),
-        ("Recommended", FileAccessChecker),
-    ]
+folders: A hierarchical structure representation of the file system, where each list describes a parent-child relationship. 
+Example: [['A', 'B'], ['B', 'C'], ['B', 'D'], ['A', 'E'], ['E', 'F']] means /A has directories /B and /E, /B contains /C and /D, and /E contains /F.
+accesses: An initial set of folders the user has access to. Example: {'A'}
+Output:
 
-    test_cases = [
-        ("/A", True, "direct access"),
-        ("/A/B", True, "inherits from /A"),
-        ("/A/B/C", True, "inherits from /A"),
-        ("/A/E", True, "inherits from /A"),
-        ("/F", True, "direct access"),
-        ("/", False, "no access to root"),
-    ]
+Return a boolean value indicating whether the user has access to the specified folder or not.
+Requirement:
 
-    for impl_name, impl_class in implementations:
-        print(f"\n{'='*60}")
-        print(f"Testing: {impl_name}")
-        print(f"{'='*60}")
+Implement the function HasAccess(string folder) to check permission according to the given rules.
+Example
 
-        checker = impl_class(all_folders, accessible_folders)
+Input: folders = [['A', 'B'], ['B', 'C'], ['B', 'D'], ['A', 'E'], ['E', 'F']], accesses = {'A'}
 
-        all_passed = True
-        for folder_path, expected, description in test_cases:
-            result = checker.has_access(folder_path)
-            status = "✓" if result == expected else "✗"
+Queries:
 
-            if result != expected:
-                all_passed = False
+HasAccess('C') should return True
+HasAccess('F') should return True
+HasAccess('D') should return True
+HasAccess('B') should return True
+Constraints
+Folder names are unique strings
+Assume the number of folders will not exceed 10,000
+'''
 
-            print(f"{status} HasAccess('{folder_path}') = {result} (expected {expected}) - {description}")
-
-        if all_passed:
-            print(f"\n✓ All tests passed for {impl_name}!")
-        else:
-            print(f"\n✗ Some tests failed for {impl_name}")
+from typing import List, Set, Dict
+from collections import defaultdict, deque
 
 
-def test_edge_cases():
-    """Test edge cases."""
+# ============================================================================
+# SOLUTION 1: Precompute All Accessible Folders (RECOMMENDED)
+# ============================================================================
 
-    print(f"\n{'='*60}")
-    print("Testing Edge Cases")
-    print(f"{'='*60}")
+class FileSystemAccessControl:
+    """
+    Optimal solution: Precompute all accessible folders during initialization.
 
-    # Edge case 1: Root access
-    all_folders = ["/", "/A", "/A/B"]
-    accessible_folders = {"/"}
-    checker = FileAccessChecker(all_folders, accessible_folders)
+    Time Complexity:
+    - Initialization: O(N) where N = number of folders
+    - HasAccess: O(1)
 
-    print("\nEdge Case 1: Root has access")
-    print(f"  HasAccess('/') = {checker.has_access('/')} (expected True)")
-    print(f"  HasAccess('/A') = {checker.has_access('/A')} (expected True)")
-    print(f"  HasAccess('/A/B') = {checker.has_access('/A/B')} (expected True)")
+    Space Complexity: O(N)
 
-    # Edge case 2: No access at all
-    accessible_folders = set()
-    checker = FileAccessChecker(all_folders, accessible_folders)
+    Best for: Multiple HasAccess queries
+    """
 
-    print("\nEdge Case 2: No accessible folders")
-    print(f"  HasAccess('/') = {checker.has_access('/')} (expected False)")
-    print(f"  HasAccess('/A') = {checker.has_access('/A')} (expected False)")
+    def __init__(self, folders: List[List[str]], accesses: Set[str]):
+        """
+        Initialize the file system with folder structure and access rights.
 
-    # Edge case 3: Deep nesting
-    all_folders = ["/", "/A", "/A/B", "/A/B/C", "/A/B/C/D", "/A/B/C/D/E"]
-    accessible_folders = {"/A"}
-    checker = FileAccessChecker(all_folders, accessible_folders)
+        Args:
+            folders: List of [parent, child] relationships
+            accesses: Set of folders user has direct access to
+        """
+        # Build parent->children mapping
+        self.children_map = defaultdict(list)
+        for parent, child in folders:
+            self.children_map[parent].append(child)
 
-    print("\nEdge Case 3: Deep nesting")
-    print(f"  HasAccess('/A/B/C/D/E') = {checker.has_access('/A/B/C/D/E')} (expected True)")
+        # Precompute all accessible folders using BFS
+        self.accessible_folders = self._compute_accessible_folders(accesses)
 
-    # Edge case 4: Multiple accessible folders in same path
-    all_folders = ["/", "/A", "/A/B", "/A/B/C"]
-    accessible_folders = {"/A", "/A/B"}  # Redundant, but valid
-    checker = FileAccessChecker(all_folders, accessible_folders)
+    def _compute_accessible_folders(self, accesses: Set[str]) -> Set[str]:
+        """
+        Compute all folders accessible from the initial access set.
 
-    print("\nEdge Case 4: Redundant accessible folders")
-    print(f"  HasAccess('/A/B/C') = {checker.has_access('/A/B/C')} (expected True)")
+        Uses BFS to traverse from accessible roots to all descendants.
+        """
+        accessible = set(accesses)  # Start with directly accessible folders
+        queue = deque(accesses)
 
+        while queue:
+            folder = queue.popleft()
 
-def performance_comparison():
-    """Compare performance of different implementations."""
-    import time
+            # Add all children to accessible set
+            for child in self.children_map[folder]:
+                if child not in accessible:
+                    accessible.add(child)
+                    queue.append(child)
 
-    print(f"\n{'='*60}")
-    print("Performance Comparison")
-    print(f"{'='*60}")
+        return accessible
 
-    # Create a large test case
-    all_folders = ["/"]
-    for i in range(100):
-        all_folders.append(f"/folder{i}")
-        for j in range(10):
-            all_folders.append(f"/folder{i}/subfolder{j}")
-            for k in range(5):
-                all_folders.append(f"/folder{i}/subfolder{j}/deep{k}")
+    def has_access(self, folder: str) -> bool:
+        """
+        Check if user has access to the folder.
 
-    accessible_folders = {f"/folder{i}" for i in range(0, 100, 10)}
-
-    implementations = [
-        ("Simple", FileAccessChecker_Simple),
-        ("Optimized", FileAccessChecker_Optimized),
-        ("Trie", FileAccessChecker_Trie),
-        ("Recommended", FileAccessChecker),
-    ]
-
-    print(f"\nTest set: {len(all_folders)} folders, {len(accessible_folders)} accessible")
-
-    for impl_name, impl_class in implementations:
-        # Measure initialization time
-        start = time.time()
-        checker = impl_class(all_folders, accessible_folders)
-        init_time = (time.time() - start) * 1000
-
-        # Measure query time (1000 queries)
-        test_queries = all_folders[:1000]
-        start = time.time()
-        for folder in test_queries:
-            checker.has_access(folder)
-        query_time = (time.time() - start) * 1000
-
-        print(f"\n{impl_name}:")
-        print(f"  Init time: {init_time:.2f}ms")
-        print(f"  Query time (1000 queries): {query_time:.2f}ms")
-        print(f"  Avg per query: {query_time/1000:.4f}ms")
-
-
-if __name__ == "__main__":
-    # Run all tests
-    test_file_access_checker()
-    test_edge_cases()
-    performance_comparison()
-
-    print(f"\n{'='*60}")
-    print("Example Usage")
-    print(f"{'='*60}")
-
-    # Example from problem statement
-    all_folders = ["/", "/A", "/A/B", "/A/B/C", "/A/B/D", "/A/E", "/F"]
-    accessible_folders = {"/A", "/F"}
-
-    checker = FileAccessChecker(all_folders, accessible_folders)
-
-    print("\nFolder structure:")
-    print("  /")
-    print("  ├── A (accessible)")
-    print("  │   ├── B")
-    print("  │   │   ├── C")
-    print("  │   │   └── D")
-    print("  │   └── E")
-    print("  └── F (accessible)")
-
-    print("\nAccess checks:")
-    for folder in all_folders:
-        has_access = checker.has_access(folder)
-        print(f"  HasAccess('{folder}') = {has_access}")
-
-    # Show all accessible folders
-    all_accessible = checker.get_all_accessible_folders(all_folders)
-    print(f"\nAll accessible folders: {sorted(all_accessible)}")
+        O(1) lookup after preprocessing.
+        """
+        return folder in self.accessible_folders
