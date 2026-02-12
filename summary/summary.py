@@ -248,3 +248,8 @@ if match:
     
     print(f"Filename: {filename}")
     print(f"Content:  {content}")
+
+
+# in 2D matrix
+# Anti-diagonal row + col = constant
+# Diagonal: row - col = constant

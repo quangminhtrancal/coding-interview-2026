@@ -423,10 +423,6 @@ class FileAccessChecker:
         return accessible
 
 
-# ============================================================================
-# TESTS
-# ============================================================================
-
 '''
 https://www.1point3acres.com/interview/problems/f0867d5b-4d3f-4ff4-9af3-0c7f8b8160ca
 

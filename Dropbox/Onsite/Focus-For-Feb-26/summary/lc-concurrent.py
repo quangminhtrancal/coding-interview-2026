@@ -374,7 +374,10 @@ class FizzBuzz:
             with self.cv:
                 while self.i <= self.n and not (self.i % 3 == 0 and self.i % 5 != 0):
                     self.cv.wait()
-                if self.i > self.n: return
+
+                if self.i > self.n: 
+                    return
+                
                 printFizz()
                 self.i += 1
                 self.cv.notify_all()
@@ -385,7 +388,10 @@ class FizzBuzz:
             with self.cv:
                 while self.i <= self.n and not (self.i % 3 != 0 and self.i % 5 == 0):
                     self.cv.wait()
-                if self.i > self.n: return
+
+                if self.i > self.n: 
+                    return
+                
                 printBuzz()
                 self.i += 1
                 self.cv.notify_all()
@@ -396,7 +402,10 @@ class FizzBuzz:
             with self.cv:
                 while self.i <= self.n and not (self.i % 3 != 0 and self.i % 5 != 0):
                     self.cv.wait()
-                if self.i > self.n: return
+
+                if self.i > self.n: 
+                    return
+                
                 printNumber(self.i)
                 self.i += 1
                 self.cv.notify_all()
@@ -581,3 +590,45 @@ class KVStore:
             raise Exception("No active transaction to rollback.")
         # Simply discard the latest transaction layer
         self.stack.pop()
+
+
+    '''
+    Bloomberg | Onsite | Key Value Store with transactions
+
+Implement (code) a Key value store with transactions.
+
+Write a Fully funcitonal code in 25-30 min in interview with test cases
+
+Set
+Get
+Delete are methods in Key value store
+
+for transactions
+Begin
+Commit
+Rollback
+
+Ideas are welcome,
+
+https://www.reddit.com/r/ExperiencedDevs/comments/16o0i1p/asked_to_implemented_windowed_key_value_store_for/
+
+Was asked to implement a windowed key value store (with an “expiry window”) say keys are only valid for 1 hour. The apis to implement are
+
+put(String key, long value)
+
+get(String key) //return -1 if value doesn’t exist or expired
+
+getAverage()
+
+The getAverage is the tricky part, needed to make it as fast as possible (as close to O(1) as we can get)
+
+I fumbled around a bit then use a HashMap which stored <key:String, value: TimedValue> where I defined TimedValue class to just be a wrapper for the long value and the timestamp. Used a doubly LinkedList in conjunction with the HashMap that also stored references to the TimedValue objects so we can find the oldest element in O(1) by accessing the tail of the list.
+
+On insertion, I checked if value already exists, remove it from the LinkedList, and then insert the new value at the head of the list. On retrieval, just got the value from the HashMap, check if timestamp is still valid given the window and currentTimeStamp.
+
+For average, I suggested removing from the tail in a while loop as long as tail is invalid (removing the expired values that are old to be included in our window) then obtaining the average of the remaining items that are still in our window.
+
+Interviewer asked how to make getAverage faster, I suggested caching the average value (maintaining a sum and count of the items in our window) and we can return the cached value if the tail isn’t expired at the time of retrieval - I see how this was wrong because I needed to also update the cached average on insertion. A further improvement I mentioned was to update that cached average value on insertion and retrieval, by updating the average with the newly inserted value and removing the expired values from the tail of the list.
+
+This morning I got an email that they will be proceeding with other candidates. I’m really upset as I really wanted that position. What could I have done better, what’s a better way to implement this? And generally how did you personally gain the technical knowledge to come up with that better solution. Is it from leetcode design questions or doing data structures and algos course? Book? Just curious.
+    '''
