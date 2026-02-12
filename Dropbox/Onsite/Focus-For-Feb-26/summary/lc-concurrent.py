@@ -591,8 +591,120 @@ class KVStore:
         # Simply discard the latest transaction layer
         self.stack.pop()
 
+'''
+Gemini solution
 
-    '''
+To implement a Key-Value store with transactions, the most effective approach is using a Stack of Dictionaries.
+
+Main Store: A dictionary representing the "committed" state.
+
+Transaction Stack: Each BEGIN pushes a new dictionary onto the stack. 
+This acts as a "buffer" or "overlay" for changes made within that transaction level.
+
+Nested Logic: GET searches from the top of the stack down to the main store. 
+COMMIT merges the top buffer into the level below it.
+'''
+
+class TransactionalKV:
+    def __init__(self):
+        # The master data store
+        self.store = {}
+        # A stack of dictionaries, each representing a transaction level
+        self.stack = []
+
+    def set(self, key, value):
+        # If in a transaction, write to the latest transaction buffer
+        if self.stack:
+            self.stack[-1][key] = value
+        else:
+            self.store[key] = value
+
+    def get(self, key):
+        # Search from the most recent transaction back to the master store
+        for scope in reversed(self.stack):
+            if key in scope:
+                return scope[key]
+        return self.store.get(key, "None")
+
+    def delete(self, key):
+        # To delete in a transaction, we use a tombstone (None)
+        # to shadow values in lower layers
+        if self.stack:
+            self.stack[-1][key] = None
+        else:
+            if key in self.store:
+                del self.store[key]
+
+    def begin(self):
+        # Start a new transaction level
+        self.stack.append({})
+
+    def commit(self):
+        if not self.stack:
+            return "NO TRANSACTION"
+        
+        # Pop the top transaction and merge it into the layer below
+        completed_tx = self.stack.pop()
+        if self.stack:
+            self.stack[-1].update(completed_tx)
+        else:
+            # If it was the last transaction, merge into master store
+            for k, v in completed_tx.items():
+                if v is None:
+                    self.store.pop(k, None)
+                else:
+                    self.store[k] = v
+
+    def rollback(self):
+        if not self.stack:
+            return "NO TRANSACTION"
+        # Simply discard the most recent transaction buffer
+        self.stack.pop()
+
+# --- Test Cases ---
+def run_tests():
+    kv = TransactionalKV()
+
+    # Test 1: Basic Set/Get
+    kv.set("a", 10)
+    assert kv.get("a") == 10
+    print("Test 1 Passed: Basic Set/Get")
+
+    # Test 2: Transaction Rollback
+    kv.begin()
+    kv.set("a", 20)
+    assert kv.get("a") == 20
+    kv.rollback()
+    assert kv.get("a") == 10
+    print("Test 2 Passed: Rollback")
+
+    # Test 3: Nested Transactions & Commit
+    kv.begin()          # Level 1
+    kv.set("a", 30)
+    kv.begin()          # Level 2
+    kv.set("a", 40)
+    assert kv.get("a") == 40
+    kv.commit()         # Commits 40 into Level 1
+    assert kv.get("a") == 40
+    kv.rollback()       # Rolls back Level 1 (which now had 40)
+    assert kv.get("a") == 10
+    print("Test 3 Passed: Nested Transactions")
+
+    # Test 4: Delete in Transaction
+    kv.set("b", 50)
+    kv.begin()
+    kv.delete("b")
+    assert kv.get("b") == "None"
+    kv.rollback()
+    assert kv.get("b") == 50
+    print("Test 4 Passed: Delete/Tombstone logic")
+
+if __name__ == "__main__":
+    run_tests()
+
+
+
+'''
     Bloomberg | Onsite | Key Value Store with transactions
 
 Implement (code) a Key value store with transactions.
@@ -632,3 +744,90 @@ Interviewer asked how to make getAverage faster, I suggested caching the average
 
 This morning I got an email that they will be proceeding with other candidates. I’m really upset as I really wanted that position. What could I have done better, what’s a better way to implement this? And generally how did you personally gain the technical knowledge to come up with that better solution. Is it from leetcode design questions or doing data structures and algos course? Book? Just curious.
     '''
+
+import time
+
+class Node:
+    def __init__(self, key, value, timestamp):
+        self.key = key
+        self.value = value
+        self.timestamp = timestamp
+        self.prev = None
+        self.next = None
+
+class WindowedKVStore:
+    def __init__(self, window_seconds=3600):
+        self.window = window_seconds
+        self.cache = {}  # key -> Node
+        
+        # Doubly Linked List for expiration ordering
+        self.head = Node(None, 0, 0) # Dummy Head (Newest)
+        self.tail = Node(None, 0, 0) # Dummy Tail (Oldest)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        
+        # Running metrics for O(1) average
+        self.total_sum = 0
+        self.total_count = 0
+
+    def _remove_node(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def _add_to_head(self, node):
+        node.next = self.head.next
+        node.prev = self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def _cleanup_expired(self):
+        """Removes all nodes from the tail that have exceeded the time window."""
+        current_time = time.time()
+        while self.total_count > 0:
+            oldest_node = self.tail.prev
+            if current_time - oldest_node.timestamp > self.window:
+                # Update running metrics
+                self.total_sum -= oldest_node.value
+                self.total_count -= 1
+                
+                # Remove from data structures
+                self._remove_node(oldest_node)
+                del self.cache[oldest_node.key]
+            else:
+                break
+
+    def put(self, key: str, value: int):
+        self._cleanup_expired()
+        
+        if key in self.cache:
+            # Remove old version from sum and list
+            old_node = self.cache[key]
+            self.total_sum -= old_node.value
+            self._remove_node(old_node)
+            self.total_count -= 1
+        
+        # Create and add new node
+        new_node = Node(key, value, time.time())
+        self._add_to_head(new_node)
+        self.cache[key] = new_node
+        
+        # Update running metrics
+        self.total_sum += value
+        self.total_count += 1
+
+    def get(self, key: str) -> int:
+        self._cleanup_expired()
+        
+        if key not in self.cache:
+            return -1
+        
+        # Note: If the requirement was "sliding window from access time", 
+        # we would update the timestamp and move to head here.
+        # But for "expiry from insertion", we just return the value.
+        return self.cache[key].value
+
+    def getAverage(self) -> float:
+        self._cleanup_expired()
+        if self.total_count == 0:
+            return 0.0
+        return self.total_sum / self.total_count
