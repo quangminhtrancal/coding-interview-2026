@@ -130,6 +130,13 @@ if idx >= 0:
     key = ts_map.iloc[idx]
     print(f"Value at T=25: {ts_map[key]}") # Output: Value B
 
+
+# To get the key <= target = 25
+idx = ts_map.bisect_right(25) - 1
+if idx >= 0:
+    key = ts_map.keys()[idx] # Returns 20
+
+
 # =======================
 from collections import defaultdict
 monthly_card_payments = defaultdict(lambda: {'count': 0, 'total': 0})

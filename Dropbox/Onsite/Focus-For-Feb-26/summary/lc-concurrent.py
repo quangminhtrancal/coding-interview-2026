@@ -702,7 +702,25 @@ def run_tests():
 if __name__ == "__main__":
     run_tests()
 
+'''
+Explain the logic
 
+Deep Dive: The Logic Breakdown1. Why self.stack[-1].update(completed_tx) is crucialIn the example above, 
+when the Inner transaction committed, it merged its values (a: 30, b: None) into the Outer layer.
+If we then called ROLLBACK on the outer layer, both the 30 and the None were discarded.
+If we had called COMMIT on the outer layer, the 30 would have replaced the 10 in the main store, and b would have been deleted from the main store.2. 
+The Tombstone (None)Notice what happened to b:Store had nothing for b.Outer set b: 100.Inner deleted b (b: None).
+When we did GET b inside the inner transaction, the code looked at the top layer, saw None, and immediately stopped. 
+It didn't look at the outer layer's 100. This is the only way to "delete" something that exists in a lower level.3. 
+
+Expected Complexity for the Interview
+
+begin / rollback: $O(1)$ (just pushing/popping from a list).
+get: $O(D)$ where $D$ is depth of nesting.set / 
+delete: $O(1)$ (dictionary insertion).
+commit: $O(K)$ where $K$ is the number of keys in the transaction being closed.
+
+'''
 
 '''
     Bloomberg | Onsite | Key Value Store with transactions
@@ -831,3 +849,7 @@ class WindowedKVStore:
         if self.total_count == 0:
             return 0.0
         return self.total_sum / self.total_count
+    
+
+families = {}
+bestword = max(families.keys(), key=lambda x: (len(families[x]), -len(x.replace('_', ''))))
