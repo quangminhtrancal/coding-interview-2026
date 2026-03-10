@@ -154,7 +154,7 @@ Spring:
 • What is the concept of Spring? When do you use POJO.JA, beans modeling, JAN, Modules
 • What is the default scope of Spring bean?
 • What do you prefer about Java dependency and for catching a Spring bean?
-• Steps to build the application what for catching a Spring been project be of xml?
+• Steps to build the application what for caching a Spring been project be of xml?
 • Using a in a process and not support from a Spring been project at of xml?
 
 Self starter related:

@@ -7,6 +7,49 @@ Cody 900.10
 Jose 200.10
 Jose 300.70
 Cody 1000.20
+
+  Critical Issues                                                                                                                                                                                         
+                                                                                                                                                                                                          
+  1. Performance Problem (line 54)                                                                                                                                                                        
+  - calculate_balance() recalculates ALL balances from scratch on every call to calculate_user_balance(). This is O(n) for each user query.                                                               
+  - Fix: Calculate balances once, or maintain them incrementally when transactions are added/deleted.                                                                                                     
+                                                                                                                                                                                                          
+  2. Variable Name Bug (line 60)                                                                                                                                                                          
+  cody_balance = calculate_user_balance('Jose')  # Wrong variable name                                                                                                                                    
+  print(f'Jose balance {cody_balance}')                                                                                                                                                                   
+  - Should be jose_balance for clarity.                                                                                                                                                                   
+                                                                                                                                                                                                          
+  Design Issues                                                                                                                                                                                           
+                                                                                                                                                                                                          
+  3. Global State (lines 30, 38)                                                                                                                                                                          
+  - Using global transactions list and transaction_map makes the code hard to test and reuse.                                                                                                             
+  - Fix: Encapsulate in a TransactionManager or AccountingSystem class.                                                                                                                                   
+                                                                                                                                                                                                          
+  4. Inefficient Balance Calculation (lines 39-51)                                                                                                                                                        
+  def calculate_balance():                                                                                                                                                                                
+      for key in transaction_map.keys():                                                                                                                                                                  
+          transaction_map[key] = 0  # Unnecessary reset                                                                                                                                                   
+  - Resetting to 0 and recalculating is wasteful.                                                                                                                                                         
+  - Fix: Update balances incrementally when transactions are added/reversed.                                                                                                                              
+                                                                                                                                                                                                          
+  5. Unused User Class (line 12-14)                                                                                                                                                                       
+  - The User class is defined but never used. Remove it or integrate it properly.                                                                                                                         
+                                                                                                                                                                                                          
+  6. Magic Number (line 74)                                                                                                                                                                               
+  if transaction.amount < 1000:  # Magic number                                                                                                                                                           
+  - Fix: Use a constant: MAX_REVERSIBLE_AMOUNT = 1000.00                                                                                                                                                  
+                                                                                                                                                                                                          
+  Logic Issues                                                                                                                                                                                            
+                                                                                                                                                                                                          
+  7. Reverse Transaction Logic (line 68-78)                                                                                                                                                               
+  - The function name says "reverse" but it only marks as deleted, doesn't actually reverse (subtract) the amount.                                                                                        
+  - No return value to indicate success/failure.                                                                                                                                                          
+  - Fix: Return boolean or raise exception if reversal fails.                                                                                                                                             
+                                                                                                                                                                                                          
+  8. No Validation                                                                                                                                                                                        
+  - No validation for negative amounts, None values, or empty user IDs.                                                                                                                                   
+  - Fix: Add validation in Transaction.__init__().                                                                                                                                                        
+                                                      
 '''
 
 class User:

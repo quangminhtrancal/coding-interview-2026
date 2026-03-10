@@ -260,3 +260,87 @@ if match:
 # in 2D matrix
 # Anti-diagonal row + col = constant
 # Diagonal: row - col = constant
+
+
+# Abstract class
+from abc import ABC, abstractmethod
+
+class Vehicle(ABC):
+    @abstractmethod
+    def start_engine(self):
+        """Abstract Method: Subclasses MUST implement this."""
+        pass
+
+    def general_info(self):
+        """Concrete Method: Subclasses can use this directly."""
+        print("This vehicle is a mode of transport.")
+
+class Car(Vehicle):
+    def start_engine(self):
+        print("Starting car engine...") # Implementation provided by Car
+
+class Bicycle(Vehicle):
+    def start_engine(self):
+        print("Pedaling to start moving...") # Implementation provided by Bicycle
+
+# Vehicle() would raise a TypeError if uncommented
+my_car = Car()
+my_bicycle = Bicycle()
+
+my_car.start_engine()
+my_car.general_info()
+my_bicycle.start_engine()
+
+
+#Inteface
+from abc import ABC, abstractmethod
+
+class Flyable(ABC):
+    @abstractmethod
+    def fly(self):
+        pass
+
+    @abstractmethod
+    def land(self):
+        pass
+
+class Bird(Flyable):
+    def fly(self):
+        print("Bird is flying with wings.")
+
+    def land(self):
+        print("Bird is landing on a branch.")
+
+class Airplane(Flyable):
+    def fly(self):
+        print("Airplane is flying through the air.")
+
+    def land(self):
+        print("Airplane is landing on a runway.")
+
+# Flyable() would raise a TypeError if uncommented
+my_bird = Bird()
+my_airplane = Airplane()
+
+my_bird.fly()
+my_airplane.land()
+
+
+'''
+Big decimal for finance transaction
+Always initialize from strings: Decimal("0.1"), not Decimal(0.1) (the latter captures the float's imprecision)
+Supports configurable precision and rounding via decimal.getcontext()
+Immutable, like Java's BigDecimal
+Arithmetic operators (+, -, *, /) work normally — no need for .add(), .subtract() like in Java
+'''
+
+from decimal import Decimal
+
+# Avoids float issues
+print(Decimal("0.1") + Decimal("0.2"))  # 0.3 (exact)
+print(0.1 + 0.2)                         # 0.30000000000000004 (float)
+
+# For financial math
+price = Decimal("174.25")
+cash = Decimal("700.00")
+print(cash - price)  # 525.75 (exact)
