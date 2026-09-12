@@ -344,3 +344,9 @@ print(0.1 + 0.2)                         # 0.30000000000000004 (float)
 price = Decimal("174.25")
 cash = Decimal("700.00")
 print(cash - price)  # 525.75 (exact)
+
+
+# ===============
+# Initializing thresholds
+max_val = float('-inf')  # Lower than any integer
+min_val = float('inf')   # Higher than any integer

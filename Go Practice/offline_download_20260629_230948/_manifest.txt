@@ -1,0 +1,113 @@
+Offline Download Archive
+Created: 2026-06-29 23:11:15
+Navigation Method: Sequential (Next button clicking)
+Asset downloading: ENABLED
+
+================================================================================
+
+GRADE LEVEL: grade9
+================================================================================
+
+  Test: English Language Arts Part A: Writing
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/628/6690
+  Folder: grade9/English Language Arts Part A_ Writing
+  Pages: 3
+  Files:
+    - page_0001.html
+    - page_0002.html
+    - page_0003.html
+
+  Test: English Language Arts Part B: Reading
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/629/6833
+  Folder: grade9/English Language Arts Part B_ Reading
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Mathematics Part A
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/646/7094
+  Folder: grade9/Mathematics Part A
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Mathematics Part B
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/647/7015
+  Folder: grade9/Mathematics Part B
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Knowledge and Eployability Science
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/435/6364
+  Folder: grade9/Knowledge and Eployability Science
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Practice test Science
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/434/6803
+  Folder: grade9/Practice test Science
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Science 9 Unit Practice Test Biological Diversity
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/959/7051
+  Folder: grade9/Science 9 Unit Practice Test Biological Diversity
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Science 9 Unit Practice Test Matter & Chemical Change
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/952/7148
+  Folder: grade9/Science 9 Unit Practice Test Matter & Chemical Change
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Science 9 Unit Practice Test Environmental Chemistry
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/988/7238
+  Folder: grade9/Science 9 Unit Practice Test Environmental Chemistry
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Science 9 Unit Practice Test Electrical Principles & Technologies
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/990/7231
+  Folder: grade9/Science 9 Unit Practice Test Electrical Principles & Technologies
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Science 9 Unit Practice Test Space Exploration
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/1012/7226
+  Folder: grade9/Science 9 Unit Practice Test Space Exploration
+  Pages: 1
+  Files:
+    - page_0001.html
+
+  Test: Social Studies 9
+  URL: https://abed.vretta.com/#/en/test-auth/shared-test-version/637/6835
+  Folder: grade9/Social Studies 9
+  Pages: 1
+  Files:
+    - page_0001.html
+
+
+================================================================================
+SUMMARY
+================================================================================
+Total grade levels: 1
+Total tests: 12
+Total pages: 14
+
+================================================================================
+
+INSTRUCTIONS FOR OFFLINE VIEWING:
+================================================================================
+1. Navigate to the grade level folder (e.g., grade9/)
+2. Open the test folder you want to view
+3. Open page_0001.html to start from the beginning
+4. Pages are numbered sequentially (page_0001.html, page_0002.html, etc.)
+5. All assets (CSS, JS, images) are stored in the 'assets' subfolder within each test folder
