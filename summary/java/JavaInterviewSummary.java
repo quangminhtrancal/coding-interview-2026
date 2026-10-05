@@ -160,7 +160,7 @@ public class JavaInterviewSummary {
     static List<Integer> slidingMax(int[] a, int k) {
         Deque<Integer> dq = new ArrayDeque<>();
         List<Integer> out = new ArrayList<>();
-        
+
         for (int i = 0; i < a.length; i++) {
             while (!dq.isEmpty() && dq.peekFirst() <= i - k) dq.pollFirst();
             while (!dq.isEmpty() && a[dq.peekLast()] <= a[i]) dq.pollLast();
@@ -202,12 +202,15 @@ public class JavaInterviewSummary {
     // 2.5 Merge Intervals
     static List<int[]> merge(int[][] iv) {
         Arrays.sort(iv, (a, b) -> Integer.compare(a[0], b[0]));
+
         List<int[]> ans = new ArrayList<>();
         int[] cur = iv[0];
+
         for (int i = 1; i < iv.length; i++) {
             if (iv[i][0] <= cur[1]) cur[1] = Math.max(cur[1], iv[i][1]);
             else { ans.add(cur); cur = iv[i]; }
         }
+        
         ans.add(cur);
         return ans;
     }
@@ -267,6 +270,7 @@ public class JavaInterviewSummary {
         height(r, max);
         return max[0];
     }
+    
     static int height(TreeNode n, int[] m) {
         if (n == null) return 0;
         int l = height(n.left, m), r = height(n.right, m);

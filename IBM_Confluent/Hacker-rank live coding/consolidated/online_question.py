@@ -1,0 +1,1854 @@
+# Confluent problems https://interviewsolver.com/interview-questions/confluent
+# https://prachub.com/companies/confluent/categories/coding-and-algorithms
+# https://www.1point3acres.com/interview/search?q=confluent
+# https://www.1point3acres.com/interview/problems/company/confluent
+# https://www.interviewdb.io/question/confluent?page=1&name=buying-chairs
+# https://www.interviewdb.io/question/confluent
+# https://share.gemini.google/ibEK0sY2cqQN
+# https://www.1point3acres.com/interview/problems/company/confluent [ consolidated questions]
+# IBM https://interviewsolver.com/interview-questions/ibm
+# https://www.aced.io/questions?company=confluent&role=swe&type=coding
+# https://www.hack2hire.com/question-bank/companies/confluent/coding-questions
+# https://www.showoffer.io/practice/confluent
+# https://www.hack2hire.com/question-bank/companies/confluent/interview-resources/68e6a799605ab8e9546847e8
+# https://crackmlinterview.com/company/confluent
+
+
+# // You are building an App that lets the users determine the most cost-effective order that they can place in a restaurant for the food items that they want to have. You have the menu of the restaurant that contains item name, and it's price. The restaurant can also offer Value Meals, which are groups of several items, at a discounted price. Write a program that accepts a list of menu items, and a list of items that the user wants to eat, and outputs the best price at which they can get all of their desired items.
+# // [Constraint: The user can order a maximum of 3 unique items.]
+# https://leetcode.com/discuss/post/4999712/confluent-coding-round-by-weirdohere-0w5f/
+
+# input
+# [5.00, "pizza"],
+# [8.00, "sandwich, coke"],
+# [4.00, "pasta"],
+# [2.00, "coke"],
+# [6.00, "pasta, coke, pizza"],
+# [8.00, "burger, coke, pizza"],
+# [5.00, "sandwich"]
+
+# user_wants: ["burger", "pasta"]
+
+# output
+# 12
+
+
+
+
+###################################
+# https://leetcode.com/discuss/post/8545763/confluent-uk-remote-interview-experience-68jv/
+# I had total of 5 rounds.
+
+# Phone Screen
+# Similar to Time Based Key-Value Store and maintaining a sum and finding average
+# Coding Round 1
+# Inverted Index question already shared on leetcode.
+# Coding Round 2
+# Similar to combination sum, with memoization follow ups
+# System Design
+# Building a podcast service, focus on feed generation.
+# Behavioural
+# Project deep dives, day to day routine, work ethics.
+
+
+###################################
+# https://leetcode.com/discuss/post/8501506/confluent-ibm-software-engineer-l2-25-yo-d5qa/
+
+# Round 1 : Online Assesment
+# 60 min Hackerrank test with 3 questions was able to solve all the questions.
+# Verdict : Positive
+
+# Round 2 : Peer To Peer Virtual DSA Round
+# Q1 : Verify Sudoko
+# Q2 : Solve Sudoko
+# Result : Both Question Solved
+
+# Time : 60 mins
+
+# Verdict : Positive
+
+# Round 3 : Peer To Peer Virtual Machine Coding Round
+# Q1 : Find word in a list of documents
+# Q2 : Find Phrase in the same sequence they appear in list of documents
+# Result : Both Question Solved
+
+# Time : 60 mins
+
+# Verdict : Positive
+
+# Round 4 : Peer To Peer Virtual Values Alignment Round
+# Focus area of this round was on my work in previous company. And Some scenarios based behavioural questions.
+
+# Now the EM/HM asked me
+
+# Q1 : You've mentioned that you wanna work in a Distributed System kinda environment, but this is a DevProd role we don't work in Distributed System Environment.
+
+# Ans : I'm Open to work in services that don't involve distributed systems environment as well. Since I've worked in Distributed Systems in past company I've mentioned but it's not a mandatory job requiremnent for me. I look forward to join the team and take ownership of projects you assign me.
+
+# Q2 : You have never worked in a DevProd Role, You have always worked for customer facing teams. I'm concerned will you be able to work here?
+
+# Ans : Yes I don't think it's a blocker anyway. I haven't got chance in my previous companies for a DevProd role. Since now I have one. I would really like to contribute.
+
+# Time : 45 mins
+
+# Verdict : Negative
+
+
+###################################
+# https://leetcode.com/discuss/post/7529937/topics-priority-for-interviews-by-diliie-bhwq/
+
+# Dynamic Programming (1d , 2d , with bit manipulation)
+# Graph. bfs /dfs (imp but sometimes ignored - topological sort , union-find)
+# Binary Search
+# Backtracking /Recursion
+# Trie
+# Segment trees
+# Sliding window
+# Bit Manipulation
+
+
+###################################
+# https://leetcode.com/discuss/post/5047273/confluent-onsite-interview-experience-re-2swo/
+# Phone Screen:
+# Implement a data structure to store key-value entries within a time-based interval.
+# Slight variation to LRU Cache.
+
+# Round 1:
+# Implement a Word Search Engine, given a list of documents with text, return the document ids that the given word belongs in. Followup: Search a phrase
+
+# Round 2:
+# Design TinyURL
+
+# Round 3:
+# Implement the Unix Tail -N Command
+
+# Round 4:
+# Talk about a project you had the most impact on, what was the biggest challenge, etc.
+
+
+###################################
+
+# convert these into list of questions
+
+
+#         {
+#             "ai_comments_count": 0,
+#             "ai_likes_count": 0,
+#             "author": "admin",
+#             "categories": [],
+#             "category": "Coding & Algorithms",
+#             "category_raw": "Coding & Algorithms",
+#             "comments": [],
+#             "comments_count": 0,
+#             "company": "Confluent",
+#             "content": "You are given a `9 x 9` Sudoku puzzle in which some cells are filled with digits and the rest are empty. Fill every empty cell so that the completed board is a valid Sudoku solution, and return the completed board.\n\n### Function Signature\n\n```python\ndef solve_sudoku(board: list[list[str]]) -> list[l",
+#             "content_enhanced": "You are given a `9 x 9` Sudoku puzzle in which some cells are filled with digits and the rest are empty. Fill every empty cell so that the completed board is a valid Sudoku solution, and return the completed board.\n\n### Function Signature\n\n```python\ndef solve_sudoku(board: list[list[str]]) -> list[l",
+#             "content_raw": null,
+#             "created_at": "2026-09-12T00:00:00",
+#             "difficulty": "medium",
+#             "has_coding_schema": true,
+#             "has_schema_data": false,
+#             "id": 12705,
+#             "interview_round": "Onsite",
+#             "is_ai_assisted": false,
+#             "is_liked": false,
+#             "is_locked": false,
+#             "is_saved": false,
+#             "is_shared": false,
+#             "is_viewed": false,
+#             "likes": [],
+#             "likes_count": 1,
+#             "lock_cohort": false,
+#             "position": "Software Engineer",
+#             "premium_sections_locked": false,
+#             "real_comments_count": 0,
+#             "real_likes_count": 0,
+#             "saves_count": 0,
+#             "schema_data": null,
+#             "section_lock": false,
+#             "seniority": "General",
+#             "shares_count": 0,
+#             "slug": "complete-a-9x9-sudoku-puzzle-that-has-exactly-one-solution",
+#             "source_content_private": true,
+#             "tags": [
+#                 "Coding & Algorithms",
+#                 "Backtracking & Recursion"
+#             ],
+#             "title": "Complete a 9x9 Sudoku Puzzle That Has Exactly One Solution",
+#             "topics": [
+#                 {
+#                     "confidence": 0.95,
+#                     "is_primary": true,
+#                     "level": 3,
+#                     "name": "Backtracking & Recursion",
+#                     "slug": "backtracking-and-recursion"
+#                 }
+#             ],
+#             "total_likes": 1,
+#             "updated_at": "2026-10-02T05:02:09.292103",
+#             "user_id": 1,
+#             "views_count": 17
+#         },
+#         {
+#             "ai_comments_count": 0,
+#             "ai_likes_count": 0,
+#             "author": "admin",
+#             "categories": [],
+#             "category": "Coding & Algorithms",
+#             "category_raw": "Coding & Algorithms",
+#             "comments": [],
+#             "comments_count": 0,
+#             "company": "Confluent",
+#             "content": "You are given a `9 x 9` Sudoku board in which some cells are filled with digits and the rest are empty. Determine whether the filled cells are consistent with the rules of Sudoku.\n\n### Function Signature\n\n```python\ndef is_valid_board(board: list[list[str]]) -> bool:\n```\n\n### Rules\n\n- Return `True` i",
+#             "content_enhanced": "You are given a `9 x 9` Sudoku board in which some cells are filled with digits and the rest are empty. Determine whether the filled cells are consistent with the rules of Sudoku.\n\n### Function Signature\n\n```python\ndef is_valid_board(board: list[list[str]]) -> bool:\n```\n\n### Rules\n\n- Return `True` i",
+#             "content_raw": null,
+#             "created_at": "2026-09-12T00:00:00",
+#             "difficulty": "medium",
+#             "has_coding_schema": true,
+#             "has_schema_data": false,
+#             "id": 12704,
+#             "interview_round": "Onsite",
+#             "is_ai_assisted": false,
+#             "is_liked": false,
+#             "is_locked": false,
+#             "is_saved": false,
+#             "is_shared": false,
+#             "is_viewed": false,
+#             "likes": [],
+#             "likes_count": 1,
+#             "lock_cohort": false,
+#             "position": "Software Engineer",
+#             "premium_sections_locked": false,
+#             "real_comments_count": 0,
+#             "real_likes_count": 0,
+#             "saves_count": 0,
+#             "schema_data": null,
+#             "section_lock": false,
+#             "seniority": "General",
+#             "shares_count": 0,
+#             "slug": "check-whether-a-partially-filled-9x9-sudoku-board-is-valid",
+#             "source_content_private": true,
+#             "tags": [
+#                 "Coding & Algorithms",
+#                 "Grids & Matrices"
+#             ],
+#             "title": "Check Whether a Partially Filled 9x9 Sudoku Board Is Valid",
+#             "topics": [
+#                 {
+#                     "confidence": 0.85,
+#                     "is_primary": true,
+#                     "level": 3,
+#                     "name": "Grids & Matrices",
+#                     "slug": "grids-and-matrices"
+#                 }
+#             ],
+#             "total_likes": 1,
+#             "updated_at": "2026-10-02T05:02:08.903378",
+#             "user_id": 1,
+#             "views_count": 10
+#         },
+#         {
+#             "ai_comments_count": 0,
+#             "ai_likes_count": 0,
+#             "author": "admin",
+#             "categories": [],
+#             "category": "Coding & Algorithms",
+#             "category_raw": "Coding & Algorithms",
+#             "comments": [],
+#             "comments_count": 0,
+#             "company": "Confluent",
+#             "content": "VO1. coding\uff0c\u5730\u91cc\u7ecf\u5178\u9898\uff1atail -n\uff0c \u8fd9\u91cc\u63d0\u9192\u4e00\u4e0b\uff0c\u56e0\u4e3a\u9762\u8bd5\u5b98\u4e00\u5b9a\u8981\u5148save\u4e00\u4e2atxt file\u8981\u4ece\u8fd9\u4e2atxt file \u91ccread string/char\u4f5c\u4e3atestcase\u6240\u4ee5\u5982\u679c\u7528java\u7684\u5c0f\u4f19\u4f34\u8bf7\u52a1\u5fc5\u719f\u6089 writebuffer/readBuffer. \u56e0\u4e3a\u8fd9\u91cc\u662f\u65e0\u6cd5\u63d0\u4f9b/\u5f53\u573a\u8ba9\u4f60\u67e5api\u7684\uff0c\u6700\u597d\u8fd8\u662f\u7528python\u6bd4\u8f83\u597d\uff08\u56e0\u4e3a\u6784\u5efatestcase\u8fd9\u91cc\u7528\u4e86\u5927\u91cf\u7684\u65f6\u95f4\uff0c\u5bfc\u81f4followup\u6ca1\u5199\u5b8c\uff09\nVO2. coding\u4e5f\u662f\u5730\u7406\u7ecf\u5178\u9898\uff0c\u5c0f\u602a\u517dcost,\u8fd9\u91cc\u57fa\u672c\u4e0adfs/bfs\u90fd\u80fd\u505a\u5f97\u51fa\u6765\u5730\u7406\u539f\u9898follow up\u4e5f\u662f\u539f\u9898\u3002\nVO3. SD\u662fRSS news feed,\u8fd9\u91cc",
+#             "content_enhanced": "This entry contains two coding tasks from the same interview category.\n\n### Task A: Implement a file tail operation\nImplement a function `tail(filePath, n)` that returns the last `n` lines of a text file in their original order.\n\nRequirements:\n- The input is a real file path, not an in-memory string",
+#             "content_raw": "",
+#             "created_at": "2026-04-29T00:00:00",
+#             "difficulty": "medium",
+#             "has_coding_schema": true,
+#             "has_schema_data": false,
+#             "id": 8735,
+#             "interview_round": "Onsite",
+#             "is_ai_assisted": false,
+#             "is_liked": false,
+#             "is_locked": false,
+#             "is_saved": false,
+#             "is_shared": false,
+#             "is_viewed": false,
+#             "likes": [],
+#             "likes_count": 20,
+#             "lock_cohort": true,
+#             "position": "Software Engineer",
+#             "real_comments_count": 0,
+#             "real_likes_count": 0,
+#             "saves_count": 0,
+#             "schema_data": null,
+#             "section_lock": false,
+#             "seniority": "General",
+#             "seo_summary": "This question evaluates competency in efficient file I/O and streaming techniques for implementing tail, and in graph search and shortest-path algorithms with path reconstruction for computing minimum monster cost in a grid.",
+#             "shares_count": 0,
+#             "slug": "implement-tail-and-find-monster-cost",
+#             "source_content_private": false,
+#             "tags": [
+#                 "Coding & Algorithms",
+#                 "Grids & Matrices",
+#                 "Graphs"
+#             ],
+#             "title": "Implement Tail and Find Monster Cost",
+#             "topics": [
+#                 {
+#                     "confidence": 0.95,
+#                     "is_primary": true,
+#                     "level": 3,
+#                     "name": "Grids & Matrices",
+#                     "slug": "grids-and-matrices"
+#                 },
+#                 {
+#                     "confidence": 0.85,
+#                     "is_primary": false,
+#                     "level": 3,
+#                     "name": "Graphs",
+#                     "slug": "graphs"
+#                 },
+#                 {
+#                     "confidence": 0.85,
+#                     "is_primary": false,
+#                     "level": 3,
+#                     "name": "Operating Systems",
+#                     "slug": "operating-systems"
+#                 }
+#             ],
+#             "total_likes": 20,
+#             "updated_at": "2026-06-06T00:36:15.805295",
+#             "user_id": 1,
+#             "views_count": 227
+#         },
+#         {
+#             "ai_comments_count": 0,
+#             "ai_likes_count": 0,
+#             "author": "admin",
+#             "categories": [],
+#             "category": "Coding & Algorithms",
+#             "category_raw": "Coding & Algorithms",
+#             "comments": [],
+#             "comments_count": 0,
+#             "company": "Confluent",
+#             "content": "\u6280\u672f\u7b5b\u9009\u8fd9\u4e00\u8f6e\u6574\u4f53\u8fd8\u662f\u6bd4\u8f83\u7b80\u5355\u7684. \u7ed9\u4f60\u4e00\u4e2a\u51fd\u6570\u67e5\u8be2\u7684 signature, \u8ba9\u4f60\u5224\u65ad\u662f\u5426\u5b58\u5728\u4e00\u4e2a\u5df2\u7ecf\u6ce8\u518c\u7684\u51fd\u6570\u53ef\u4ee5\u5339\u914d. \u540e\u9762\u4f1a\u6d89\u53ca optional arguments \u4ee5\u53ca variable number of arguments \u8fd9\u79cd\u60c5\u51b5.\nOnsite \u4e00\u5171\u6709\u56db\u8f6e.\n\u7b2c\u4e00\u8f6e coding \u662f\u5b9e\u73b0\u7c7b\u4f3c\u6253\u5370\u6587\u4ef6\u6700\u540e N \u884c\u7684\u529f\u80fd, \u540c\u65f6\u8ba8\u8bba\u4e00\u4e9b tradeoff \u548c\u4f18\u5316, \u6bd4\u5982\u7528 buffer \u8fd8\u662f\u7528 file pointer offset \u6765\u505a. \u540e\u534a\u90e8\u5206\u504f\u7406\u8bba, \u7ed9\u4f60\u4e00\u5957 file API, \u7c7b\u4f3c\u53ef\u4ee5 read N bytes, \u79fb\u52a8 file pointer +N \u6216 -N, \u4ee5\u53ca",
+#             "content_enhanced": "Solve the following interview-style problems:\n\n1. **Function signature matching**\n   You are given a registry of function definitions. Each function has an ordered parameter list where parameters may be **required**, **optional**, or a trailing **variadic** parameter. Given a candidate call signatur",
+#             "content_raw": "",
+#             "created_at": "2026-02-22T00:00:00",
+#             "difficulty": "medium",
+#             "has_coding_schema": true,
+#             "has_schema_data": false,
+#             "id": 8133,
+#             "interview_round": "Onsite",
+#             "is_ai_assisted": false,
+#             "is_liked": false,
+#             "is_locked": false,
+#             "is_saved": false,
+#             "is_shared": false,
+#             "is_viewed": false,
+#             "likes": [],
+#             "likes_count": 19,
+#             "lock_cohort": true,
+#             "position": "Software Engineer",
+#             "real_comments_count": 0,
+#             "real_likes_count": 0,
+#             "saves_count": 0,
+#             "schema_data": null,
+#             "section_lock": false,
+#             "seniority": "Senior+",
+#             "seo_summary": "This multi-part prompt evaluates skills in function signature and type matching, resource-constrained file I/O and streaming for large files, and data-structure design for randomized queues including multiset equality, synchronization, and compact run-length encodings.",
+#             "shares_count": 0,
+#             "slug": "solve-signature-file-and-queue-problems",
+#             "source_content_private": false,
+#             "tags": [
+#                 "Coding & Algorithms",
+#                 "Data Structure Design"
+#             ],
+#             "title": "Solve Signature, File, and Queue Problems",
+#             "topics": [
+#                 {
+#                     "confidence": 0.86,
+#                     "is_primary": true,
+#                     "level": 3,
+#                     "name": "Data Structure Design",
+#                     "slug": "data-structure-design"
+#                 }
+#             ],
+#             "total_likes": 19,
+#             "updated_at": "2026-05-06T21:21:14.390573",
+#             "user_id": 1,
+#             "views_count": 175
+#         },
+#         {
+#             "ai_comments_count": 0,
+#             "ai_likes_count": 0,
+#             "author": "admin",
+#             "categories": [],
+#             "category": "Coding & Algorithms",
+#             "category_raw": "Coding & Algorithms",
+#             "comments": [],
+#             "comments_count": 0,
+#             "company": "Confluent",
+#             "content": null,
+#             "content_enhanced": null,
+#             "content_raw": null,
+#             "created_at": "2026-02-12T00:00:00",
+#             "difficulty": "easy",
+#             "has_coding_schema": true,
+#             "has_schema_data": false,
+#             "id": 6632,
+#             "interview_round": "Technical Screen",
+#             "is_ai_assisted": false,
+#             "is_liked": false,
+#             "is_locked": true,
+#             "is_saved": false,
+#             "is_shared": false,
+#             "is_viewed": false,
+#             "likes": [],
+#             "likes_count": 20,
+#             "lock_cohort": false,
+#             "position": "Software Engineer",
+#             "real_comments_count": 0,
+#             "real_likes_count": 0,
+#             "saves_count": 0,
+#             "schema_data": null,
+#             "section_lock": false,
+#             "seniority": "General",
+#             "seo_summary": "This question evaluates understanding of data structures\u2014particularly priority queues/heaps\u2014and techniques for efficiently handling global/bulk updates and minimum extraction under changing offsets.",
+#             "shares_count": 0,
+#             "slug": "process-pod-logs-with-global-increments-and-pop-min",
+#             "source_content_private": false,
+#             "tags": [
+#                 "Coding & Algorithms",
+#                 "Heaps & Priority Queues"
+#             ],
+#             "title": "Process pod logs with global increments and pop-min",
+#             "topics": [
+#                 {
+#                     "confidence": 0.95,
+#                     "is_primary": true,
+#                     "level": 3,
+#                     "name": "Heaps & Priority Queues",
+#                     "slug": "heaps"
+#                 }
+#             ],
+#             "total_likes": 20,
+#             "updated_at": "2026-06-27T04:42:32.061122",
+#             "user_id": 1,
+#             "views_count": 230
+#         }
+#     ],
+#     "ranking_policy": "pop2|questions_feed|rank:new|pers:0|dith:0|seed:0",
+#     "topic": null
+
+
+###################################
+# https://leetcode.com/discuss/post/5166350/confluent-senior-software-engineer-offer-87jb/
+# My experience regarding recent SSE interview rounds with Confluent -
+# I took a referral.
+# After 20 days, recruiter called me and asked to schedule a Qualifer round.
+
+# Qualifier Round:
+# I was asked a DSA+LLD question and was supposed to implement and run it on coderpad. There were followup question on time complexity and Concurrency(Locking especially).
+# Recruiter mailed after 3 days after followup and scheduled full onsite loop.
+
+# Onsite 1
+# Was asked a DSA question in 2 parts first being easy-medium and second being medium-hard. Again working code was required with good coding practice. Wrote it nicely and interviewer was impressed.
+
+# Onsite 2
+# Was Asked a LLD question particularly on optimizing memory while reading a huge file as part of the problem. Awareness of low level language memory constucts was key. Was able to solve it and run. Working code was important again. Discussed further optimization on memory access when asked but could not code as we were out of time. Struggled a little with API knowledge but was able to get through. Interviewer seemed fine in the end.
+
+# Onsite 3
+# Was Asked a HLD question and was the easist round as HLD being my favourite and forte. Had to draw and explain the thought process with tradeoffs being made. Interviewer seemed happy.
+
+# Onsite 4
+# This was a deep dive+cultural fit round. Usual question around the project and different phases and situations in project and how did i handle them. This went really well.
+
+# After one week, followed up with recruiter and they said its a hire call. They setup a role sell call post that.
+
+
+
+
+
+# Qualifier Round:
+# Given a window size,
+# perform get, put, and average operation
+# items that were added before the window size should be removed while taking average as well, and also during get operation, return null if item expired.
+# window size 1hr
+# 00:00 put("A",10)
+# 00:10 put("B",20)
+# 00:30 average() -> 15
+# 01:05 average () -> 20
+# 01:08 get("B") -> 20
+# 01:15 put("A",30)
+# 01:50 average -> 30
+
+# Onsite 1: Implement a Word Search Engine, given a list of documents with text, return the document ids that the given word belongs in. Followup: Search a phrase
+# Onsite 2: Implement the Unix Tail -N Command
+
+# I guessed questions after reading other confluent interview experiences.
+
+###################################
+"""
+
+Warehouse Loading: Reach
+
+You manage a loading dock robot. You are given
+
+N: operations represented by an integer array `
+
+W:  W[i] > 0  : load an item ofW[i]
+(The total load increases). W[i] < 0 unload/remove weight|W[i]|
+(the total load The robot starts with total load 0
+
+.You do not know the order in
+
+N
+
+Operations arbitrarily.
+
+Determine whether there exists an ordering such that, at some point during execution—that is, 
+for some prefix of the chosen ordering—the running total equals exactly
+
+TargetWeight
+
+.
+
+Input
+
+Integer N
+Integer arrayW of lengthN
+Integer TargetWeight
+Output
+
+Output   true
+
+if there exists an ordering whose prefix
+
+TargetWeight
+
+at some step; otherwise output
+
+false
+.
+
+Constraints
+The problem statement on this page does not specify
+
+Are negative running totals allowed?
+What are the ranges forN
+,W[i]
+,TargetWeight
+?
+Sample tests
+
+N=3, W=[2, -1, 4], TargetWeight=1
+→ `truetrue
+N=2, W=[-3, 5], TargetWeight=2
+→true
+if negative prefixes are allowed
+Same as (2) →false
+if negative prefixes are not allowed
+N=3, W=[1, 1, 1], TargetWeight=2
+→true
+N=3, W=[-1, -2, -3], TargetWeight=-3
+→true
+
+
+{
+  "title": "Warehouse Loading: Target Reach",
+  "description": "You are managing an automated loading dock robot. You are given an array W containing N operations, 
+  where W[i] > 0 represents loading an item of weight W[i] and W[i] < 0 represents unloading weight |W[i]|. 
+  The robot begins with an initial total load of 0. You can execute the N operations in any arbitrary order. 
+  Determine whether there exists at least one permutation of the operations such that at some point 
+  during execution (i.e., after executing some prefix of the chosen ordering), the running total load equals exactly TargetWeight.",
+  "input_format": {
+    "N": "An integer representing the number of operations.",
+    "W": "An integer array of length N containing the weight operations.",
+    "TargetWeight": "An integer representing the desired target total load."
+  },
+  "output_format": "Boolean (true if there exists an ordering where a prefix sum equals TargetWeight; otherwise false).",
+  "constraints_and_notes": [
+    "Negative Running Totals: Clarify whether the total load is allowed to drop below 0 at intermediate steps.",
+    "Value Ranges: Constraints on N, W[i], and TargetWeight determine whether to use Subset Sum / Dynamic Programming or DFS / Backtracking."
+  ],
+  "sample_tests": [
+    {
+      "input": {
+        "N": 3,
+        "W": [2, -1, 4],
+        "TargetWeight": 1
+      },
+      "output": true,
+      "explanation": "Execute in order [-1, 2, 4]. After the first operation (-1), total is -1. After the second (+2), total becomes 1, matching TargetWeight."
+    },
+    {
+      "input": {
+        "N": 2,
+        "W": [-3, 5],
+        "TargetWeight": 2
+      },
+      "output": {
+        "negative_totals_allowed": true,
+        "negative_totals_disallowed": false
+      },
+      "explanation": "If negative total loads are permitted, order [-3, 5] yields running totals -3, then 2 (reaches target). If non-negative prefix constraint is enforced, valid sequences may vary."
+    },
+    {
+      "input": {
+        "N": 3,
+        "W": [1, 1, 1],
+        "TargetWeight": 2
+      },
+      "output": true,
+      "explanation": "Execute in order [1, 1, 1]. After 2 steps, total load is 2."
+    },
+    {
+      "input": {
+        "N": 3,
+        "W": [-1, -2, -3],
+        "TargetWeight": -3
+      },
+      "output": true,
+      "explanation": "Execute in order [-3, -1, -2]. Reaches total load -3 on the first step."
+    }
+  ]
+}
+"""
+
+
+###################################
+# https://www.1point3acres.com/interview/problems/company/ibm/maximum-concurrent-processes
+
+###################################
+"""
+{
+  "title": "Print Last N Lines (Tail Utility)",
+  "description": "Read an integer N, then process the remaining stream or file input to print the final N lines in their original order while maintaining bounded memory usage.",
+  "algorithm_strategy": {
+    "name": "Streaming Queue / Ring Buffer",
+    "steps": [
+      "Read the input line by line.",
+      "Maintain a FIFO queue holding at most N lines.",
+      "If pushing a new line causes queue size to exceed N, pop the oldest line.",
+      "At end-of-file (EOF), print all lines remaining in the queue in chronological order."
+    ]
+  },
+  "edge_cases": [
+    "If N = 0, print nothing.",
+    "If total lines < N, print all available lines.",
+    "Handle non-newline terminated final lines (ensure the final string segment counts as a line).",
+    "Avoid treating a trailing newline at EOF as an additional empty line.",
+    "Avoid loading the entire file into memory; memory usage should be strictly bounded by N lines."
+  ]
+}
+"""
+
+
+###################################
+
+"""
+Insufficient details: only mentions a 'monster cost' problem solvable via DFS/BFS with a follow-up identical to the original; 
+missing concrete I/O, cost definition, and constraints, so it is omitted.
+"""
+
+###################################
+
+"""
+The Random Queue ADT on this page behaves like a queue in how items are added, but unlike a FIFO queue, each removal chooses uniformly at random from the items currently present.
+
+Part A: Core behavior
+
+enqueue(x)
+: addx
+.
+dequeue()
+: choose one current item uniformly, remove it, and return it.
+peek()
+(optional): return a random item without removing it.
+size()
+: return the number of items.
+A common design is to store items in a dynamic array. To dequeue, choose a random index, save that item, replace its slot with the last item, and remove the last slot. This avoids shifting elements. Under the usual assumption that random-index generation is constant time, enqueue and dequeue are expected O(1); storage is O(n).
+
+dequeue
+
+on an empty queue needs a defined behavior, such as throwing an exception or returning an optional value.Part B: Equality
+
+First decide what equality means. A natural choice is multiset equality: two queues are equal if they contain the same values with the same multiplicities, regardless of storage order. For example,
+
+[a, a, b]
+
+equals[b, a, a]
+
+, but not[a, b, b]
+
+.If elements are hashable, compare sizes and frequency maps. If you sort copies instead, comparison takes O(n log n). Avoid mutating the queues while checking equality.
+
+Part C: Thread safety
+
+The random choice and removal must be one atomic operation. Otherwise, another thread could change the queue between reading its size, choosing an index, and removing the item. Protect related operations with a lock, or use a carefully designed concurrent structure. Decide whether
+
+size()
+
+andpeek()
+
+need a consistent snapshot, and document the guarantee. A basic lock around each operation provides simple linearizable behavior.Part D: RLE-backed equality
+
+For run-length encoding, compare the represented multisets without expanding all repeated elements. Aggregate counts per value across runs, since the same value may appear in multiple runs—even in different positions or split into different run lengths. Then compare the aggregated counts for both queues. This takes time proportional to the number of runs plus the number of distinct values, with space proportional to the number of distinct values.
+
+The exact comparison method depends on the element types and whether hashing or ordering is available. I couldn’t find a separate Confluent question-bank entry for this prompt; the available Confluent interview experiences may provide related context. 
+
+
+
+{
+  "title": "Random Queue ADT",
+  "description": "A Random Queue Abstract Data Type behaves like a standard queue when adding items, but removes elements uniformly at random rather than following First-In, First-Out (FIFO) ordering.",
+  "sections": {
+    "part_a_core_behavior": {
+      "title": "Core Behavior & Operations",
+      "operations": [
+        {
+          "method": "enqueue(x)",
+          "description": "Add item x to the queue."
+        },
+        {
+          "method": "dequeue()",
+          "description": "Choose one current item uniformly at random, remove it, and return it."
+        },
+        {
+          "method": "peek()",
+          "description": "Return a randomly chosen item without removing it (optional operation)."
+        },
+        {
+          "method": "size()",
+          "description": "Return the current number of items in the queue."
+        }
+      ],
+      "implementation_details": {
+        "underlying_structure": "Dynamic Array",
+        "removal_strategy": "Select a random index, store its value, overwrite the slot with the last element in the array, and pop the last slot. This eliminates array shifting.",
+        "time_complexity": "O(1) expected for enqueue and dequeue (assuming O(1) random index generation).",
+        "space_complexity": "O(n) space.",
+        "edge_cases": "Calling dequeue() on an empty queue must have defined error handling (e.g., throwing an exception or returning an optional/null value)."
+      }
+    },
+    "part_b_equality": {
+      "title": "Equality Logic",
+      "definition": "Multiset Equality: Two random queues are equal if they contain the exact same elements with identical frequencies/multiplicities, regardless of internal storage order.",
+      "examples": {
+        "equal": ["[a, a, b]", "[b, a, a]"],
+        "not_equal": ["[a, a, b]", "[a, b, b]"]
+      },
+      "approaches": [
+        {
+          "type": "Hash Map Frequency Counter",
+          "time_complexity": "O(n)",
+          "requirements": "Elements must be hashable. Compare size and element frequency maps."
+        },
+        {
+          "type": "Sorting Copies",
+          "time_complexity": "O(n log n)",
+          "requirements": "Elements must be comparable/sortable."
+        }
+      ],
+      "constraints": "Equality checks must non-destructively inspect the queues without mutating their contents."
+    },
+    "part_c_thread_safety": {
+      "title": "Thread Safety & Concurrency",
+      "atomic_operations": "Random index selection and item removal must occur as a single atomic operation to prevent race conditions where queue size or content changes mid-operation.",
+      "concurrency_strategies": [
+        "Reentrant/Mutex Locks: Wrap each public method (enqueue, dequeue, peek, size) in a lock to guarantee simple linearizable behavior.",
+        "Snapshot Guarantees: Decide and document whether size() and peek() reflect a consistent point-in-time snapshot of the queue."
+      ]
+    },
+    "part_d_rle_backed_equality": {
+      "title": "Run-Length Encoding (RLE) Equality",
+      "description": "Compare multisets directly from run-length encoded representations without expanding repeated elements into memory.",
+      "algorithm": "Aggregate total counts per distinct value across all runs (since identical values can appear in separate runs or vary in run lengths), then compare aggregated counts between queues.",
+      "time_complexity": "O(R + V), where R is total runs and V is total distinct values.",
+      "space_complexity": "O(V) to store aggregated frequency counts."
+    }
+  }
+}
+"""
+
+
+###################################
+
+"""
+The problem on your current page is “Text Search: search a word, then search a phrase (follow-up).” It asks you to tokenize a multi-line text and answer two kinds of queries:
+
+WORD <word>
+: count tokens equal to that word.
+PHRASE <phrase>
+: count occurrences where the phrase’s tokens appear consecutively and in order.
+Tokenization and matching
+
+Split on any non-alphanumeric character, then compare case-insensitively. For example,
+
+Hello, world!
+
+becomes the tokenshello
+
+,world
+
+. A phrase match is based on adjacent tokens—not on raw characters—so punctuation between words does not prevent a match.For the sample text,
+
+PHRASE hello world
+
+matchesHello, world!
+
+, whilePHRASE world hello
+
+matchesworld: hello.
+
+. The phrase does not match if another token lies between its words.A straightforward approach
+
+Read all text lines and tokenize them into one sequence of normalized words.
+For eachWORD
+query, count matching tokens.
+For eachPHRASE
+query, tokenize the phrase and scan the text tokens for matching consecutive sequences.
+If there are
+
+T
+
+text tokens andP
+
+tokens in a phrase, a direct scan takesO(T × P)
+
+in the worst case for that phrase. With many queries, reuse preprocessing: build a frequency map for word queries, and consider a more efficient phrase-matching method if performance constraints require it. The page’s stated limits allow a large text and many queries, so discuss the tradeoff between a simple scan and indexing/preprocessing.One subtlety: keep token order across line boundaries unless the prompt explicitly says each line is separate; the given description defines the text as multi-line but does not specify that lines break phrase matching. The searchable Confluent materials don’t include this question, but you can browse the Confluent interview experiences. 
+
+
+{
+  "title": "Text Search: Single Word & Consecutive Phrase Matching",
+  "description": "Tokenize a multi-line text input and efficiently answer search queries for individual words and multi-word phrases.",
+  "tokenization_rules": {
+    "delimiter": "Split on any non-alphanumeric character (e.g., spaces, punctuation, symbols).",
+    "case_sensitivity": "Case-insensitive (convert all tokens to lowercase during normalization).",
+    "punctuation_handling": "Punctuation acts purely as a delimiter and is discarded during tokenization.",
+    "line_boundary_behavior": "Token stream is continuous across line breaks unless explicitly constrained.",
+    "example": {
+      "raw_text": "Hello, world!",
+      "normalized_tokens": ["hello", "world"]
+    }
+  },
+  "query_types": [
+    {
+      "type": "WORD <word>",
+      "description": "Count total occurrences of the target token within the normalized text stream.",
+      "time_complexity": "O(1) lookup using a pre-computed frequency hash map."
+    },
+    {
+      "type": "PHRASE <phrase>",
+      "description": "Count occurrences where the phrase's normalized tokens appear consecutively and in exact order.",
+      "matching_rule": "Matches adjacent tokens regardless of intervening original punctuation. Fails if another token lies between phrase words.",
+      "examples": [
+        {
+          "query": "PHRASE hello world",
+          "matches": "Hello, world!",
+          "matched": true
+        },
+        {
+          "query": "PHRASE world hello",
+          "matches": "world: hello.",
+          "matched": true
+        }
+      ]
+    }
+  ],
+  "implementation_approaches": [
+    {
+      "approach": "Direct Linear Scan",
+      "steps": [
+        "Tokenize and normalize all lines into a flat list of text tokens.",
+        "For WORD queries, count exact token matches in the list.",
+        "For PHRASE queries, tokenize the phrase and run a sliding-window scan across the text tokens."
+      ],
+      "time_complexity": "O(T * P) per phrase query (where T = total text tokens, P = phrase tokens).",
+      "space_complexity": "O(T) space to store the token sequence."
+    },
+    {
+      "approach": "Indexed Preprocessing (Optimized for High Query Volume)",
+      "steps": [
+        "Build a frequency hash map for WORD queries to enable O(1) lookups.",
+        "Build an inverted index mapping each word to a list of its token positions in the text.",
+        "For PHRASE queries, intersect position lists of constituent tokens to find adjacent index sequences."
+      ],
+      "time_complexity": "O(1) for WORD queries; significantly faster than O(T * P) for PHRASE queries.",
+      "space_complexity": "O(T) space for inverted index positional postings."
+    }
+  ]
+}
+"""
+
+###################################
+
+"""
+Silent Sensor Detector (
+
+SensorHealth
+
+) asks you to track ping timestamps per sensor and answer whether a sensor is"STABLE"
+
+or"UNSTABLE"
+
+at query timeT
+
+.The prompt available on your current page is incomplete: it does not define the rule for deciding stability. For example, stability might mean “received a ping within the last
+
+K
+
+seconds,” but the interviewer needs to specifyK
+
+, whether the boundary counts, and how to handle a sensor with no pings. Don’t assume a rule until it’s clarified.Once the rule is defined, a reasonable starting design is to store each sensor’s ping timestamps. If pings arrive in timestamp order, you may only need the latest timestamp for a “recent ping” rule. If they can arrive out of order or queries concern historical times, you’ll need more history, typically sorted per sensor.
+
+Clarify these details with the interviewer:
+
+What exactly makes a sensor stable?
+Can pings arrive out of timestamp order?
+Can query times move backward?
+What should happen for an unknown sensor?
+What are the expected scale and memory limits? 
+
+{
+  "title": "Silent Sensor Detector (SensorHealth)",
+  "description": "Track ping timestamps for each sensor and determine whether a given sensor is 'STABLE' or 'UNSTABLE' at a specific query time T.",
+  "status": "Incomplete Problem Definition — System requires clarification on the exact stability rule and operating parameters before final implementation.",
+  "core_functionality": {
+    "primary_task": "Ingest sensor ping events and answer stability health checks at arbitrary time points.",
+    "output_states": [
+      "STABLE",
+      "UNSTABLE"
+    ]
+  },
+  "implementation_design": {
+    "latest_ping_only": {
+      "use_case": "Pings arrive strictly in chronological order and query targets current time.",
+      "data_structure": "Hash Map mapping SensorID to its single latest timestamp.",
+      "space_complexity": "O(1) space per sensor."
+    },
+    "historical_timeseries": {
+      "use_case": "Pings arrive out of order or queries check historical timestamps.",
+      "data_structure": "Hash Map mapping SensorID to a sorted list/deque of timestamps.",
+      "query_method": "Binary search (e.g., lower_bound / bisect) to find the most recent ping prior to query time T.",
+      "space_complexity": "O(P) where P is total retained ping history."
+    }
+  },
+  "clarification_checklist": [
+    "Stability Criteria: What exact mathematical condition defines 'STABLE'? (e.g., receiving at least 1 ping in the window [T - K, T], or a minimum frequency within window K?)",
+    "Boundary Conditions: Is the threshold window inclusive or exclusive of boundaries? How should sensors with zero recorded pings be categorized?",
+    "Event Ordering: Can ping events arrive out of chronological order?",
+    "Query Patterns: Are queries strictly real-time and monotonic, or can query time T jump backwards to check historical health?",
+    "Unknown Entities: How should the system respond to queries for an unrecognized SensorID?",
+    "Scale & Constraints: What are the expected bounds on number of sensors, total pings, query throughput, and available memory?"
+  ]
+}
+"""
+
+###################################
+
+"""
+The problem shown on your current page is “Retrieve Token List.” Its description is brief: given a
+create_time
+and a token, implement a function that retrieves the corresponding token and the current token list.
+
+That description doesn’t explain the data model or rules, so the exact expected behavior isn’t clear. Before designing the implementation, clarify:
+
+Is
+create_time
+a timestamp, a unique ID, or a sort key?
+Can multiple tokens have the same
+create_time
+?
+Does “current token list” mean all tokens, or only active/unexpired ones?
+What should happen if the requested token or timestamp does not exist?
+Do updates or deletions need to be supported?
+A likely starting point is a collection of token records, with a lookup structure keyed by whatever uniquely identifies a record. If the list must be ordered by
+create_time
+, maintain that ordering explicitly; don’t assume timestamps are unique unless the prompt says so.
+
+================================
+"""
+
+"""
+===============================================================================
+PROBLEM STATEMENT: TOKEN MANAGEMENT SYSTEM (Confluent)
+===============================================================================
+
+Design a token management system that supports generating, validating, and 
+retrieving API or authentication tokens based on creation timestamps and 
+expiration rules.
+
+-------------------------------------------------------------------------------
+DATA MODEL & SPECIFICATIONS
+-------------------------------------------------------------------------------
+Each token record consists of:
+  • token (str)       : Unique identifier for the token.
+  • create_time (int) : Creation timestamp in seconds or milliseconds.
+  • ttl (int)         : Time duration (time-to-live) in seconds for which 
+                        the token remains valid.
+
+-------------------------------------------------------------------------------
+KEY REQUIREMENTS & API SPECIFICATIONS
+-------------------------------------------------------------------------------
+1. generate(tokenId, createTime)
+   - Registers a new token into the system associated with its creation timestamp.
+
+2. renew(tokenId, currentTime)
+   - Renews an existing token's expiration window if it has not already expired.
+
+3. retrieveTokenList(currentTime)  OR  retrieve(createTime, tokenId)
+   - Returns all currently active (unexpired) tokens at currentTime.
+   - Returns the list ordered chronologically by create_time 
+     (lexicographically by tokenId as a tie-breaker).
+   - Automatically ignores/prunes expired tokens (where create_time + ttl <= currentTime).
+
+-------------------------------------------------------------------------------
+STANDARD CLARIFICATIONS
+-------------------------------------------------------------------------------
+• Is create_time unique?
+  No. Multiple tokens can share the exact same timestamp. Order is maintained 
+  by composite key (create_time, tokenId).
+
+• What constitutes an active token?
+  A token is active if: currentTime < create_time + ttl
+
+• Optimal Data Structures:
+  - HashMap / Dictionary for O(1) token lookup by tokenId.
+  - SortedSet / Red-Black Tree / Doubly-Linked List to maintain ordering by 
+    timestamp for efficient range queries and cleanup.
+===============================================================================
+"""
+
+from sortedcontainers import SortedSet
+
+
+class TokenRecord:
+    def __init__(self, token_id: str, create_time: int, ttl: int):
+        self.token_id = token_id
+        self.create_time = create_time
+        self.expiry_time = create_time + ttl
+
+    def __lt__(self, other: "TokenRecord") -> bool:
+        # Ordering: primary key = create_time, tie-breaker = token_id
+        if self.create_time == other.create_time:
+            return self.token_id < other.token_id
+        return self.create_time < other.create_time
+
+    def __repr__(self) -> str:
+        return f"Token('{self.token_id}', create={self.create_time}, expiry={self.expiry_time})"
+
+
+class TokenManager:
+    def __init__(self, default_ttl: int):
+        self.default_ttl = default_ttl
+        self.tokens: dict[str, TokenRecord] = {}
+        self.active_tokens: SortedSet[TokenRecord] = SortedSet()
+
+    def _cleanup_expired(self, current_time: int) -> None:
+        """Removes all expired tokens up to current_time."""
+        expired_ids = [
+            record.token_id
+            for record in self.tokens.values()
+            if record.expiry_time <= current_time
+        ]
+        for tid in expired_ids:
+            record = self.tokens.pop(tid)
+            self.active_tokens.discard(record)
+
+    def generate(self, token_id: str, create_time: int) -> bool:
+        """Registers a new token. Returns False if token_id already exists."""
+        if token_id in self.tokens:
+            return False
+
+        record = TokenRecord(token_id, create_time, self.default_ttl)
+        self.tokens[token_id] = record
+        self.active_tokens.add(record)
+        return True
+
+    def renew(self, token_id: str, current_time: int) -> bool:
+        """
+        Renews an unexpired token by resetting its expiry window.
+        Returns False if token does not exist or has expired.
+        """
+        self._cleanup_expired(current_time)
+
+        if token_id not in self.tokens:
+            return False
+
+        record = self.tokens[token_id]
+        if record.expiry_time <= current_time:
+            return False
+
+        self.active_tokens.remove(record)
+        record.expiry_time = current_time + self.default_ttl
+        self.active_tokens.add(record)
+        return True
+
+    def retrieve_token_list(self, current_time: int) -> list[str]:
+        """Returns active token IDs ordered chronologically by create_time."""
+        self._cleanup_expired(current_time)
+        return [record.token_id for record in self.active_tokens]
+
+    def retrieve(self, token_id: str, current_time: int) -> TokenRecord | None:
+        """Retrieves a single active token record, or None if expired/nonexistent."""
+        self._cleanup_expired(current_time)
+        return self.tokens.get(token_id)
+
+
+# =============================================================================
+# DEMO & TESTING
+# =============================================================================
+if __name__ == "__main__":
+    tm = TokenManager(default_ttl=10)
+
+    # 1. Generate tokens
+    tm.generate("token_A", create_time=100)
+    tm.generate("token_B", create_time=105)
+    tm.generate("token_C", create_time=100)  # Same create_time as A
+
+    print("Active at t=108:", tm.retrieve_token_list(current_time=108))
+    # Output: ['token_A', 'token_C', 'token_B']
+
+    # 2. Renew token_A at t=108 (expiry shifts to 108 + 10 = 118)
+    tm.renew("token_A", current_time=108)
+
+    # 3. Check active list at t=112 (B and C expired at t=110 & t=115, A active until 118)
+    print("Active at t=112:", tm.retrieve_token_list(current_time=112))
+    # Output: ['token_A']
+
+
+###################################
+
+"""
+
+Message Logger asks you to implement
+
+In this Confluent interview question, you are tasked with designing an 
+efficient notification filtering utility that prevents duplicate log entries 
+from appearing within a specific temporal window. 
+The exercise tests your ability to manage state and apply appropriate time-based thresholds 
+using optimal data structures. 
+Review the complete problem walkthrough and expert reference solution by subscribing to our platform.
+
+shouldPrintMessage(timestamp, message)
+
+. It should return true when the message may be printed, 
+and false when that same message was printed too recently.
+The rule is per message: printing one message does not affect whether a different message can print.
+
+Example with a 10-second window
+
+(0, "order received")
+→true
+; it has not been printed before.
+(1, "order received")
+→false
+; only 1 second has passed.
+(2, "shipment sent")
+→true
+; this is a different message.
+(11, "order received")
+→true
+; 11 seconds have passed since its previous print.
+Efficient approach
+
+Keep a hash map from each message to the timestamp when it was last printed. When a request arrives:
+
+If the message isn’t in the map, allow it and record the timestamp.
+Otherwise, compare the new timestamp with its recorded timestamp.
+If at least 10 seconds have passed, allow it and update the recorded timestamp.
+Otherwise, reject it and leave the recorded timestamp unchanged.
+For example, if a message was printed at time
+
+0
+
+, a request at time10
+
+is allowed under the usual interpretation of a 10-second cooldown:10 - 0 >= 10
+
+.Each request takes O(1) average time; the map uses space proportional to the number of distinct messages seen. Because timestamps arrive chronologically, you can optionally remove old map entries to reclaim memory, but that cleanup isn’t needed for correctness. 
+{
+  "title": "Message Logger (Rate Limiter / Cooldown)",
+  "description": "Implement a method `shouldPrintMessage(timestamp, message)` that determines whether a given message should be printed '
+  based on a rate-limiting cooldown window (e.g., 10 seconds). The limit applies independently per distinct message.",
+  "interface": {
+    "method": "shouldPrintMessage(timestamp, message)",
+    "inputs": {
+      "timestamp": "An integer representing the current time in seconds.",
+      "message": "A string representing the log message content."
+    },
+    "output": "Boolean (true if the message is permitted to print; false otherwise)."
+  },
+  "rules": {
+    "cooldown_window": 10,
+    "scope": "Per-message (printing one message does not affect the rate limit or availability of a different message).",
+    "timestamp_ordering": "Timestamps arrive in strictly non-decreasing / chronological order."
+  },
+  "example_trace": [
+    {
+      "timestamp": 0,
+      "message": "order received",
+      "allowed": true,
+      "reason": "First time encountering this message."
+    },
+    {
+      "timestamp": 1,
+      "message": "order received",
+      "allowed": false,
+      "reason": "Only 1 second has elapsed since last print (1 - 0 < 10)."
+    },
+    {
+      "timestamp": 2,
+      "message": "shipment sent",
+      "allowed": true,
+      "reason": "Different message; tracked independently."
+    },
+    {
+      "timestamp": 11,
+      "message": "order received",
+      "allowed": true,
+      "reason": "11 seconds have elapsed since last print (11 - 0 >= 10); timestamp updated to 11."
+    }
+  ],
+  "implementation_details": {
+    "algorithm_steps": [
+      "Maintain a Hash Map mapping each `message` string to its last printed `timestamp`.",
+      "Upon receiving `(timestamp, message)` check if `message` exists in the map.",
+      "If not present: record `map[message] = timestamp` and return `true`.",
+      "If present: compare `timestamp - map[message]`.",
+      "If elapsed time >= 10: update `map[message] = timestamp` and return `true`.",
+      "Otherwise: leave `map[message]` unchanged and return `false`."
+    ],
+    "complexity": {
+      "time_complexity": "O(1) average time per request.",
+      "space_complexity": "O(M) space, where M is the number of distinct messages seen."
+    },
+    "memory_optimization": "Since timestamps arrive chronologically, stale entries (where `current_timestamp - recorded_timestamp >= 10`) can be periodically purged using a FIFO queue to prevent unbounded memory growth."
+  }
+}
+"""
+class Logger:
+
+    def __init__(self):
+        self.msg_dict = {}
+
+    def shouldPrintMessage(self, timestamp: int, message: str) -> bool:
+        if message not in self.msg_dict:
+            self.msg_dict[message] = timestamp
+            return True
+        
+        if timestamp - self.msg_dict[message] >= 10:
+            self.msg_dict[message] = timestamp
+            return True
+        
+        return False
+
+#     2. Memory-Optimized Approach (Queue + Set)
+# In system design and higher-level coding interviews (like Confluent), follow-up questions often ask how to prevent memory leaks 
+# when messages arrive infinitely. Since entries older than 10 seconds become irrelevant, you can clean them up using a Queue (FIFO) paired with a Set.
+
+from collections import deque
+
+class Logger:
+
+    def __init__(self):
+        # Stores tuples of (timestamp, message)
+        self.queue = deque()
+        # Stores unique messages within the current 10-second window
+        self.msg_set = set()
+
+    def shouldPrintMessage(self, timestamp: int, message: str) -> bool:
+        # 1. Clean up stale messages outside the 10-second window
+        while self.queue and timestamp - self.queue[0][0] >= 10:
+            old_timestamp, old_msg = self.queue.popleft()
+            self.msg_set.remove(old_msg)
+
+        # 2. Check if message was printed within the last 10 seconds
+        if message in self.msg_set:
+            return False
+
+        # 3. Add message to tracking structures
+        self.queue.append((timestamp, message))
+        self.msg_set.add(message)
+        return True
+    
+# Key Follow-Up Interview Questions
+# If asked this in an interview, be prepared for these common extensions:
+
+# Concurrent / Thread-Safe Logger: How would you handle multiple worker threads submitting log messages at once? (Use a mutex/lock around the map, or use thread-safe ConcurrentHashMap structures).
+
+# Distributed Rate Limiting: What if logs come from multiple servers where timestamps might arrive slightly out of order? (Use Redis with sliding window logs or token buckets).
+
+import threading
+from collections import deque
+
+class ThreadSafeLogger:
+    def __init__(self, time_limit: int = 10):
+        self.time_limit = time_limit
+        self.lock = threading.Lock()
+        
+        # State tracked inside the locked critical section
+        self.queue = deque()      # Keeps (timestamp, message) order
+        self.msg_set = set()      # Quick O(1) lookup for active window
+
+    def shouldPrintMessage(self, timestamp: int, message: str) -> bool:
+        with self.lock:
+            # 1. Evict messages outside the window
+            while self.queue and timestamp - self.queue[0][0] >= self.time_limit:
+                _, old_msg = self.queue.popleft()
+                self.msg_set.remove(old_msg)
+
+            # 2. Check presence
+            if message in self.msg_set:
+                return False
+
+            # 3. Insert and permit
+            self.queue.append((timestamp, message))
+            self.msg_set.add(message)
+            return True
+###################################
+"""
+For “Minimum Value to Get Positive Step by Step Sum,” find the smallest positive starting value
+x
+such that every running total stays strictly greater than zero as you add the array values from left to right.
+
+For
+nums = [-3, 2, -3, 4, 2]
+, the running totals starting from
+x = 5
+are:
+
+5 → 2 → 4 → 1 → 5 → 7
+
+They are all positive. Starting with
+x = 4
+would eventually produce
+0
+, which is not positive, so
+5
+is the minimum.
+
+Key observation
+Let
+prefix
+be the sum of the array values seen so far, and track the smallest prefix sum, including the initial empty prefix
+0
+. Every running total is
+x + prefix
+, so the condition is:
+
+x + minPrefix > 0
+
+Therefore:
+
+x = max(1, 1 - minPrefix)
+
+For the example, the minimum prefix sum is
+-4
+, so
+x = max(1, 1 - (-4)) = 5
+.
+
+Scan the array once, updating the cumulative sum and its minimum. This takes O(n) time and O(1) extra space. The example explanation on your page appears inconsistent: the running totals for
+x = 5
+are
+2, 4, 1, 5, 7
+, not
+5, 2, -1, 3, 5
+. The stated answer
+5
+is still correct.
+
+
+{
+  "title": "Minimum Value to Get Positive Step by Step Sum",
+  "description": "Find the smallest positive starting integer `x` (where x ≥ 1) such that the cumulative running total stays strictly positive (greater than 0) after adding each element of the array sequentially from left to right.",
+  "formula": "x = max(1, 1 - minPrefix)",
+  "key_observation": "For any step i, the running sum equals `x + prefix[i]`. To ensure `x + prefix[i] >= 1` for all i, `x` must be at least `1 - minPrefix`, bounded below by 1 because `x` must be a positive starting value.",
+  "algorithm": {
+    "steps": [
+      "Initialize `current_prefix = 0` and `min_prefix = 0`.",
+      "Iterate through the array, updating `current_prefix += num`.",
+      "At each step, track `min_prefix = min(min_prefix, current_prefix)`.",
+      "Return `max(1, 1 - min_prefix)`."
+    ],
+    "time_complexity": "O(n) — single linear pass through the array.",
+    "space_complexity": "O(1) — constant extra space."
+  },
+  "example_trace": {
+    "input": {
+      "nums": [-3, 2, -3, 4, 2]
+    },
+    "prefix_sums": [-3, -1, -4, 0, 2],
+    "min_prefix": -4,
+    "calculated_x": 5,
+    "running_totals_with_x_equals_5": [
+      {
+        "step": 1,
+        "num": -3,
+        "running_total": 2
+      },
+      {
+        "step": 2,
+        "num": 2,
+        "running_total": 4
+      },
+      {
+        "step": 3,
+        "num": -3,
+        "running_total": 1
+      },
+      {
+        "step": 4,
+        "num": 4,
+        "running_total": 5
+      },
+      {
+        "step": 5,
+        "num": 2,
+        "running_total": 7
+      }
+    ]
+  },
+  "notes_and_corrections": "If x = 4 were chosen, step 3 (-3) would produce a running total of 0 (which is not strictly positive). Thus, x = 5 is the minimal valid positive starting value."
+}
+"""
+
+
+
+###################################
+
+"""
+Get best price
+Find the minimum total price to get all requested menu items using single items and discounted value meals.
+Input: menu items with prices, value meal bundles with prices, and a desired item list; Output: best total price; Constraint: up to 3 unique items.
+Real-world context: restaurant ordering app optimizing cost for a user’s meal.
+From Confluent interviews; a coding interview problem and common interview question on bundle pricing.
+"""
+
+
+###################################
+
+"""
+Function Overloading Matching with Variable Arguments Support
+
+The Function Overloading Matching with Variable Arguments Support prompt asks you to register function signatures, then return every function whose signature matches a supplied list of argument types.
+
+A function is represented by its name, a vector of parameter types, and an
+isCard
+flag. In Part 1,
+isCard
+is false: a function matches only when its parameter list has the same length as the input and every type matches in the same position. So a function with
+{"Integer", "Boolean"}
+matches that exact argument list, but not
+{"Integer"}
+.
+
+In Part 2,
+isCard == true
+means the final parameter is variadic: it can match zero or more additional arguments of that type. For example,
+{"Integer"}
+with
+isCard == true
+can match
+{"Integer"}
+and
+{"Integer", "Integer", "Integer"}
+. The fixed parameters must still match exactly; each extra argument must match the variadic parameter’s type. Return all matches, since distinct functions may have identical signatures.
+
+A straightforward implementation checks each registered function against the input: verify the fixed argument positions, then validate any extra arguments if it is variadic. With
+n
+functions and at most
+m
+arguments, this costs O(n · m) per lookup and uses O(n · m) storage for the registrations.
+
+One detail to confirm from the full prompt: whether a variadic function with an empty parameter list is valid, since there would be no final parameter type to repeat. I couldn’t find this exact question in Confluent’s searchable materials; the available Confluent interview experiences may offer related context.
+
+{
+  "title": "Function Overloading Matching with Variable Arguments Support",
+  "description": "Register function signatures and evaluate queries to return all registered functions whose signature matches a supplied sequence of argument types.",
+  "data_structures": {
+    "Function": {
+      "name": "String — Name of the function.",
+      "parameter_types": "List<String> — Ordered vector/list of expected parameter type names.",
+      "is_card": "Boolean — Indicates whether the final parameter is a variadic (wildcard) parameter."
+    }
+  },
+  "matching_rules": {
+    "part_1_exact_matching": {
+      "condition": "is_card == false",
+      "rules": [
+        "Argument count must equal parameter count exactly (len(args) == len(params)).",
+        "Every argument type must match the parameter type at the corresponding position."
+      ],
+      "example": {
+        "parameters": ["Integer", "Boolean"],
+        "matches": [["Integer", "Boolean"]],
+        "non_matches": [["Integer"], ["Integer", "Boolean", "String"]]
+      }
+    },
+    "part_2_variadic_matching": {
+      "condition": "is_card == true",
+      "rules": [
+        "The first (len(params) - 1) arguments must match the corresponding non-variadic fixed parameters.",
+        "The final parameter type can match zero or more additional trailing arguments.",
+        "Every trailing argument beyond the fixed parameters must match the final variadic parameter's type."
+      ],
+      "example": {
+        "parameters": ["Integer"],
+        "is_card": true,
+        "matches": [
+          [],
+          ["Integer"],
+          ["Integer", "Integer", "Integer"]
+        ],
+        "non_matches": [["String"], ["Integer", "String"]]
+      }
+    }
+  },
+  "matching_behavior": {
+    "return_type": "List of all matching functions (multiple distinct registered functions may match the same call signature)."
+  },
+  "complexity_analysis": {
+    "per_lookup_time": "O(N * M), where N is the number of registered functions and M is the number of input argument types.",
+    "space_complexity": "O(N * M) to store registered function parameter lists."
+  },
+  "clarification_notes": [
+    "Verify whether a function with is_card == true and an empty parameter list (len(params) == 0) is valid, as there is no final parameter type specified for variadic matching."
+  ]
+}
+"""
+
+
+###################################
+
+"""
+The problem asks for a key-value store supporting:
+
+Put(key, value)
+: insert a key or update its value.
+Get(key)
+: return the value for a key.
+GetAverage()
+: return the average of all stored values.
+GetMax()
+: return the largest stored value.
+The important complication is that updating a key can remove the current maximum. For example, if the values are
+8
+and
+5
+, then updating the key holding
+8
+to
+2
+means the new maximum is
+5
+. A simple variable holding the previous maximum cannot determine that efficiently by itself.
+
+What’s straightforward
+Use a hash map
+key → value
+for
+Get
+and key lookup in
+Put
+. Keep a running
+sum
+and the number of keys; on insert or update, adjust the sum by the change in value. This makes
+GetAverage()
+constant time.
+
+The max requirement needs clarification
+For arbitrary values and unrestricted updates, maintaining the exact maximum in worst-case O(1) is not generally achieved by just a hash map and a running maximum. You need to account for removing a value from the set of candidates when it is overwritten. A balanced search tree or heap with suitable bookkeeping can support updates and max retrieval efficiently, but typically not all in worst-case O(1).
+
+So ask whether values are bounded (for example, integers in a small known range), whether updates are restricted, and whether “O(1)” means average/expected time. Those constraints determine a valid design. The exact question wasn’t found in Confluent’s searchable materials; 
+
+
+
+"""
+
+###################################
+
+"""
+https://www.glassdoor.ca/Interview/Confluent-Software-Engineer-Interview-Questions-EI_IE1048428.0,9_KO10,27_IP4.htm
+
+Interview
+
+1. Regex pattern matching 2. Java concurrency using threads type problem 3. Matrix path finding problem with weigths in each cells 4. Behaviour style round with hiring manager Be well prepared with leetcode medium and hard problems. Interviewers were very friendly overall. Looks like a good company.
+Interview questions [1]
+
+Question 1
+
+Regex pattern matching along with java concurrenty
+
+====
+Interview questions [1]
+
+Question 1
+
+1. Create a data structure that can perform CRUD operations on data coming in a time period.
+
+
+==============
+Interview questions [1]
+
+Question 1
+
+Similar to wildcard pattern matching using Dynamic Programming.
+
+
+
+"""
+
+
+###################################
+
+
+"""
+https://leetcode.com/discuss/post/1878821/confluent-onsite-search-phrase-in-docume-1yn1/
+
+You are given a list of documents with id and text.
+Eg :-
+DocId, Text
+1, "Cloud computing is the on-demand availability of computer system resources."
+2, "One integrated service for metrics uptime cloud monitoring dashboards and alerts reduces time spent navigating between systems."
+3, "Monitor entire cloud infrastructure, whether in the cloud computing is or in virtualized data centers."
+
+Search a given phrase in all the documents in a efficient manner. Assume that you have more than 1 million docs.
+Eg :-
+search("cloud") >> This should output [1,2,3]
+search("cloud monitoring") >> This should output [2]
+search("Cloud computing is") >> This should output [1,3]
+"""
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+"""
+"""
+
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+"""
+"""
+
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+"""
+"""
+
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+"""
+"""
+
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+###################################
+
+"""
+"""
+
+
+###################################
+
+"""
+"""
+
+
+###################################
+"""
+"""
+
+
+
+###################################
+
+"""
+"""
+
+
+###################################
