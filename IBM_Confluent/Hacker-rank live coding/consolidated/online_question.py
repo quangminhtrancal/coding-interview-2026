@@ -448,20 +448,27 @@
 # After 20 days, recruiter called me and asked to schedule a Qualifer round.
 
 # Qualifier Round:
-# I was asked a DSA+LLD question and was supposed to implement and run it on coderpad. There were followup question on time complexity and Concurrency(Locking especially).
+# I was asked a DSA+LLD question and was supposed to implement and run it on coderpad. There were followup question on time complexity and 
+# Concurrency(Locking especially).
 # Recruiter mailed after 3 days after followup and scheduled full onsite loop.
 
 # Onsite 1
-# Was asked a DSA question in 2 parts first being easy-medium and second being medium-hard. Again working code was required with good coding practice. Wrote it nicely and interviewer was impressed.
+# Was asked a DSA question in 2 parts first being easy-medium and second being medium-hard. Again working code was required with good coding practice.
+#  Wrote it nicely and interviewer was impressed.
 
 # Onsite 2
-# Was Asked a LLD question particularly on optimizing memory while reading a huge file as part of the problem. Awareness of low level language memory constucts was key. Was able to solve it and run. Working code was important again. Discussed further optimization on memory access when asked but could not code as we were out of time. Struggled a little with API knowledge but was able to get through. Interviewer seemed fine in the end.
+# Was Asked a LLD question particularly on optimizing memory while reading a huge file as part of the problem. 
+# Awareness of low level language memory constucts was key. Was able to solve it and run. Working code was important again.
+#  Discussed further optimization on memory access when asked but could not code as we were out of time. 
+# Struggled a little with API knowledge but was able to get through. Interviewer seemed fine in the end.
 
 # Onsite 3
-# Was Asked a HLD question and was the easist round as HLD being my favourite and forte. Had to draw and explain the thought process with tradeoffs being made. Interviewer seemed happy.
+# Was Asked a HLD question and was the easist round as HLD being my favourite and forte. 
+# Had to draw and explain the thought process with tradeoffs being made. Interviewer seemed happy.
 
 # Onsite 4
-# This was a deep dive+cultural fit round. Usual question around the project and different phases and situations in project and how did i handle them. This went really well.
+# This was a deep dive+cultural fit round. Usual question around the project and different phases and situations in project and how did i handle them. 
+# This went really well.
 
 # After one week, followed up with recruiter and they said its a hire call. They setup a role sell call post that.
 
@@ -500,60 +507,6 @@ W:  W[i] > 0  : load an item ofW[i]
 (The total load increases). W[i] < 0 unload/remove weight|W[i]|
 (the total load The robot starts with total load 0
 
-.You do not know the order in
-
-N
-
-Operations arbitrarily.
-
-Determine whether there exists an ordering such that, at some point during execution—that is, 
-for some prefix of the chosen ordering—the running total equals exactly
-
-TargetWeight
-
-.
-
-Input
-
-Integer N
-Integer arrayW of lengthN
-Integer TargetWeight
-Output
-
-Output   true
-
-if there exists an ordering whose prefix
-
-TargetWeight
-
-at some step; otherwise output
-
-false
-.
-
-Constraints
-The problem statement on this page does not specify
-
-Are negative running totals allowed?
-What are the ranges forN
-,W[i]
-,TargetWeight
-?
-Sample tests
-
-N=3, W=[2, -1, 4], TargetWeight=1
-→ `truetrue
-N=2, W=[-3, 5], TargetWeight=2
-→true
-if negative prefixes are allowed
-Same as (2) →false
-if negative prefixes are not allowed
-N=3, W=[1, 1, 1], TargetWeight=2
-→true
-N=3, W=[-1, -2, -3], TargetWeight=-3
-→true
-
-
 {
   "title": "Warehouse Loading: Target Reach",
   "description": "You are managing an automated loading dock robot. You are given an array W containing N operations, 
@@ -591,7 +544,8 @@ N=3, W=[-1, -2, -3], TargetWeight=-3
         "negative_totals_allowed": true,
         "negative_totals_disallowed": false
       },
-      "explanation": "If negative total loads are permitted, order [-3, 5] yields running totals -3, then 2 (reaches target). If non-negative prefix constraint is enforced, valid sequences may vary."
+      "explanation": "If negative total loads are permitted, order [-3, 5] yields running totals -3, then 2 (reaches target). 
+      If non-negative prefix constraint is enforced, valid sequences may vary."
     },
     {
       "input": {
