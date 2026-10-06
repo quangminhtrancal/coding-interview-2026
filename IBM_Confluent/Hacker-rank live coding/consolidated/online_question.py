@@ -132,313 +132,39 @@
 
 
 #         {
-#             "ai_comments_count": 0,
-#             "ai_likes_count": 0,
-#             "author": "admin",
-#             "categories": [],
-#             "category": "Coding & Algorithms",
-#             "category_raw": "Coding & Algorithms",
-#             "comments": [],
-#             "comments_count": 0,
 #             "company": "Confluent",
 #             "content": "You are given a `9 x 9` Sudoku puzzle in which some cells are filled with digits and the rest are empty. Fill every empty cell so that the completed board is a valid Sudoku solution, and return the completed board.\n\n### Function Signature\n\n```python\ndef solve_sudoku(board: list[list[str]]) -> list[l",
 #             "content_enhanced": "You are given a `9 x 9` Sudoku puzzle in which some cells are filled with digits and the rest are empty. Fill every empty cell so that the completed board is a valid Sudoku solution, and return the completed board.\n\n### Function Signature\n\n```python\ndef solve_sudoku(board: list[list[str]]) -> list[l",
-#             "content_raw": null,
-#             "created_at": "2026-09-12T00:00:00",
-#             "difficulty": "medium",
-#             "has_coding_schema": true,
-#             "has_schema_data": false,
-#             "id": 12705,
-#             "interview_round": "Onsite",
-#             "is_ai_assisted": false,
-#             "is_liked": false,
-#             "is_locked": false,
-#             "is_saved": false,
-#             "is_shared": false,
-#             "is_viewed": false,
-#             "likes": [],
-#             "likes_count": 1,
-#             "lock_cohort": false,
-#             "position": "Software Engineer",
-#             "premium_sections_locked": false,
-#             "real_comments_count": 0,
-#             "real_likes_count": 0,
-#             "saves_count": 0,
-#             "schema_data": null,
-#             "section_lock": false,
-#             "seniority": "General",
-#             "shares_count": 0,
-#             "slug": "complete-a-9x9-sudoku-puzzle-that-has-exactly-one-solution",
-#             "source_content_private": true,
-#             "tags": [
-#                 "Coding & Algorithms",
-#                 "Backtracking & Recursion"
-#             ],
-#             "title": "Complete a 9x9 Sudoku Puzzle That Has Exactly One Solution",
-#             "topics": [
-#                 {
-#                     "confidence": 0.95,
-#                     "is_primary": true,
-#                     "level": 3,
-#                     "name": "Backtracking & Recursion",
-#                     "slug": "backtracking-and-recursion"
-#                 }
-#             ],
-#             "total_likes": 1,
-#             "updated_at": "2026-10-02T05:02:09.292103",
-#             "user_id": 1,
-#             "views_count": 17
 #         },
 #         {
-#             "ai_comments_count": 0,
-#             "ai_likes_count": 0,
-#             "author": "admin",
-#             "categories": [],
-#             "category": "Coding & Algorithms",
-#             "category_raw": "Coding & Algorithms",
-#             "comments": [],
-#             "comments_count": 0,
 #             "company": "Confluent",
 #             "content": "You are given a `9 x 9` Sudoku board in which some cells are filled with digits and the rest are empty. Determine whether the filled cells are consistent with the rules of Sudoku.\n\n### Function Signature\n\n```python\ndef is_valid_board(board: list[list[str]]) -> bool:\n```\n\n### Rules\n\n- Return `True` i",
 #             "content_enhanced": "You are given a `9 x 9` Sudoku board in which some cells are filled with digits and the rest are empty. Determine whether the filled cells are consistent with the rules of Sudoku.\n\n### Function Signature\n\n```python\ndef is_valid_board(board: list[list[str]]) -> bool:\n```\n\n### Rules\n\n- Return `True` i",
-#             "content_raw": null,
-#             "created_at": "2026-09-12T00:00:00",
-#             "difficulty": "medium",
-#             "has_coding_schema": true,
-#             "has_schema_data": false,
-#             "id": 12704,
-#             "interview_round": "Onsite",
-#             "is_ai_assisted": false,
-#             "is_liked": false,
-#             "is_locked": false,
-#             "is_saved": false,
-#             "is_shared": false,
-#             "is_viewed": false,
-#             "likes": [],
-#             "likes_count": 1,
-#             "lock_cohort": false,
-#             "position": "Software Engineer",
-#             "premium_sections_locked": false,
-#             "real_comments_count": 0,
-#             "real_likes_count": 0,
-#             "saves_count": 0,
-#             "schema_data": null,
-#             "section_lock": false,
-#             "seniority": "General",
-#             "shares_count": 0,
-#             "slug": "check-whether-a-partially-filled-9x9-sudoku-board-is-valid",
-#             "source_content_private": true,
-#             "tags": [
-#                 "Coding & Algorithms",
-#                 "Grids & Matrices"
-#             ],
-#             "title": "Check Whether a Partially Filled 9x9 Sudoku Board Is Valid",
-#             "topics": [
-#                 {
-#                     "confidence": 0.85,
-#                     "is_primary": true,
-#                     "level": 3,
-#                     "name": "Grids & Matrices",
-#                     "slug": "grids-and-matrices"
-#                 }
-#             ],
-#             "total_likes": 1,
-#             "updated_at": "2026-10-02T05:02:08.903378",
-#             "user_id": 1,
-#             "views_count": 10
 #         },
 #         {
-#             "ai_comments_count": 0,
-#             "ai_likes_count": 0,
-#             "author": "admin",
-#             "categories": [],
-#             "category": "Coding & Algorithms",
-#             "category_raw": "Coding & Algorithms",
-#             "comments": [],
-#             "comments_count": 0,
 #             "company": "Confluent",
 #             "content": "VO1. coding\uff0c\u5730\u91cc\u7ecf\u5178\u9898\uff1atail -n\uff0c \u8fd9\u91cc\u63d0\u9192\u4e00\u4e0b\uff0c\u56e0\u4e3a\u9762\u8bd5\u5b98\u4e00\u5b9a\u8981\u5148save\u4e00\u4e2atxt file\u8981\u4ece\u8fd9\u4e2atxt file \u91ccread string/char\u4f5c\u4e3atestcase\u6240\u4ee5\u5982\u679c\u7528java\u7684\u5c0f\u4f19\u4f34\u8bf7\u52a1\u5fc5\u719f\u6089 writebuffer/readBuffer. \u56e0\u4e3a\u8fd9\u91cc\u662f\u65e0\u6cd5\u63d0\u4f9b/\u5f53\u573a\u8ba9\u4f60\u67e5api\u7684\uff0c\u6700\u597d\u8fd8\u662f\u7528python\u6bd4\u8f83\u597d\uff08\u56e0\u4e3a\u6784\u5efatestcase\u8fd9\u91cc\u7528\u4e86\u5927\u91cf\u7684\u65f6\u95f4\uff0c\u5bfc\u81f4followup\u6ca1\u5199\u5b8c\uff09\nVO2. coding\u4e5f\u662f\u5730\u7406\u7ecf\u5178\u9898\uff0c\u5c0f\u602a\u517dcost,\u8fd9\u91cc\u57fa\u672c\u4e0adfs/bfs\u90fd\u80fd\u505a\u5f97\u51fa\u6765\u5730\u7406\u539f\u9898follow up\u4e5f\u662f\u539f\u9898\u3002\nVO3. SD\u662fRSS news feed,\u8fd9\u91cc",
-#             "content_enhanced": "This entry contains two coding tasks from the same interview category.\n\n### Task A: Implement a file tail operation\nImplement a function `tail(filePath, n)` that returns the last `n` lines of a text file in their original order.\n\nRequirements:\n- The input is a real file path, not an in-memory string",
-#             "content_raw": "",
-#             "created_at": "2026-04-29T00:00:00",
-#             "difficulty": "medium",
-#             "has_coding_schema": true,
-#             "has_schema_data": false,
-#             "id": 8735,
-#             "interview_round": "Onsite",
-#             "is_ai_assisted": false,
-#             "is_liked": false,
-#             "is_locked": false,
-#             "is_saved": false,
-#             "is_shared": false,
-#             "is_viewed": false,
-#             "likes": [],
-#             "likes_count": 20,
-#             "lock_cohort": true,
-#             "position": "Software Engineer",
-#             "real_comments_count": 0,
-#             "real_likes_count": 0,
-#             "saves_count": 0,
-#             "schema_data": null,
-#             "section_lock": false,
-#             "seniority": "General",
-#             "seo_summary": "This question evaluates competency in efficient file I/O and streaming techniques for implementing tail, and in graph search and shortest-path algorithms with path reconstruction for computing minimum monster cost in a grid.",
-#             "shares_count": 0,
-#             "slug": "implement-tail-and-find-monster-cost",
-#             "source_content_private": false,
-#             "tags": [
-#                 "Coding & Algorithms",
-#                 "Grids & Matrices",
-#                 "Graphs"
-#             ],
-#             "title": "Implement Tail and Find Monster Cost",
-#             "topics": [
-#                 {
-#                     "confidence": 0.95,
-#                     "is_primary": true,
-#                     "level": 3,
-#                     "name": "Grids & Matrices",
-#                     "slug": "grids-and-matrices"
-#                 },
-#                 {
-#                     "confidence": 0.85,
-#                     "is_primary": false,
-#                     "level": 3,
-#                     "name": "Graphs",
-#                     "slug": "graphs"
-#                 },
-#                 {
-#                     "confidence": 0.85,
-#                     "is_primary": false,
-#                     "level": 3,
-#                     "name": "Operating Systems",
-#                     "slug": "operating-systems"
-#                 }
-#             ],
-#             "total_likes": 20,
-#             "updated_at": "2026-06-06T00:36:15.805295",
-#             "user_id": 1,
-#             "views_count": 227
-#         },
-#         {
-#             "ai_comments_count": 0,
-#             "ai_likes_count": 0,
-#             "author": "admin",
-#             "categories": [],
-#             "category": "Coding & Algorithms",
-#             "category_raw": "Coding & Algorithms",
-#             "comments": [],
-#             "comments_count": 0,
+#             "content_enhanced": "This entry contains two coding tasks from the same interview category.\n\n### 
+# Task A: Implement a file tail operation\nImplement a function `tail(filePath, n)` that returns the last `n` lines of a text file in their original order.
+# \n\nRequirements:\n- The input is a real file path, not an in-memory string",
+#             "seo_summary": "This question evaluates competency in efficient file I/O and streaming techniques for implementing tail, 
+# and in graph search and shortest-path algorithms with path reconstruction for computing minimum monster cost in a grid.",
+#
 #             "company": "Confluent",
 #             "content": "\u6280\u672f\u7b5b\u9009\u8fd9\u4e00\u8f6e\u6574\u4f53\u8fd8\u662f\u6bd4\u8f83\u7b80\u5355\u7684. \u7ed9\u4f60\u4e00\u4e2a\u51fd\u6570\u67e5\u8be2\u7684 signature, \u8ba9\u4f60\u5224\u65ad\u662f\u5426\u5b58\u5728\u4e00\u4e2a\u5df2\u7ecf\u6ce8\u518c\u7684\u51fd\u6570\u53ef\u4ee5\u5339\u914d. \u540e\u9762\u4f1a\u6d89\u53ca optional arguments \u4ee5\u53ca variable number of arguments \u8fd9\u79cd\u60c5\u51b5.\nOnsite \u4e00\u5171\u6709\u56db\u8f6e.\n\u7b2c\u4e00\u8f6e coding \u662f\u5b9e\u73b0\u7c7b\u4f3c\u6253\u5370\u6587\u4ef6\u6700\u540e N \u884c\u7684\u529f\u80fd, \u540c\u65f6\u8ba8\u8bba\u4e00\u4e9b tradeoff \u548c\u4f18\u5316, \u6bd4\u5982\u7528 buffer \u8fd8\u662f\u7528 file pointer offset \u6765\u505a. \u540e\u534a\u90e8\u5206\u504f\u7406\u8bba, \u7ed9\u4f60\u4e00\u5957 file API, \u7c7b\u4f3c\u53ef\u4ee5 read N bytes, \u79fb\u52a8 file pointer +N \u6216 -N, \u4ee5\u53ca",
-#             "content_enhanced": "Solve the following interview-style problems:\n\n1. **Function signature matching**\n   You are given a registry of function definitions. Each function has an ordered parameter list where parameters may be **required**, **optional**, or a trailing **variadic** parameter. Given a candidate call signatur",
-#             "content_raw": "",
-#             "created_at": "2026-02-22T00:00:00",
-#             "difficulty": "medium",
-#             "has_coding_schema": true,
-#             "has_schema_data": false,
-#             "id": 8133,
-#             "interview_round": "Onsite",
-#             "is_ai_assisted": false,
-#             "is_liked": false,
-#             "is_locked": false,
-#             "is_saved": false,
-#             "is_shared": false,
-#             "is_viewed": false,
-#             "likes": [],
-#             "likes_count": 19,
-#             "lock_cohort": true,
-#             "position": "Software Engineer",
-#             "real_comments_count": 0,
-#             "real_likes_count": 0,
-#             "saves_count": 0,
-#             "schema_data": null,
-#             "section_lock": false,
-#             "seniority": "Senior+",
-#             "seo_summary": "This multi-part prompt evaluates skills in function signature and type matching, resource-constrained file I/O and streaming for large files, and data-structure design for randomized queues including multiset equality, synchronization, and compact run-length encodings.",
-#             "shares_count": 0,
-#             "slug": "solve-signature-file-and-queue-problems",
-#             "source_content_private": false,
-#             "tags": [
-#                 "Coding & Algorithms",
-#                 "Data Structure Design"
-#             ],
-#             "title": "Solve Signature, File, and Queue Problems",
-#             "topics": [
-#                 {
-#                     "confidence": 0.86,
-#                     "is_primary": true,
-#                     "level": 3,
-#                     "name": "Data Structure Design",
-#                     "slug": "data-structure-design"
-#                 }
-#             ],
-#             "total_likes": 19,
-#             "updated_at": "2026-05-06T21:21:14.390573",
-#             "user_id": 1,
-#             "views_count": 175
-#         },
-#         {
-#             "ai_comments_count": 0,
-#             "ai_likes_count": 0,
-#             "author": "admin",
-#             "categories": [],
-#             "category": "Coding & Algorithms",
-#             "category_raw": "Coding & Algorithms",
-#             "comments": [],
-#             "comments_count": 0,
-#             "company": "Confluent",
-#             "content": null,
-#             "content_enhanced": null,
-#             "content_raw": null,
-#             "created_at": "2026-02-12T00:00:00",
-#             "difficulty": "easy",
-#             "has_coding_schema": true,
-#             "has_schema_data": false,
-#             "id": 6632,
-#             "interview_round": "Technical Screen",
-#             "is_ai_assisted": false,
-#             "is_liked": false,
-#             "is_locked": true,
-#             "is_saved": false,
-#             "is_shared": false,
-#             "is_viewed": false,
-#             "likes": [],
-#             "likes_count": 20,
-#             "lock_cohort": false,
-#             "position": "Software Engineer",
-#             "real_comments_count": 0,
-#             "real_likes_count": 0,
-#             "saves_count": 0,
-#             "schema_data": null,
-#             "section_lock": false,
-#             "seniority": "General",
-#             "seo_summary": "This question evaluates understanding of data structures\u2014particularly priority queues/heaps\u2014and techniques for efficiently handling global/bulk updates and minimum extraction under changing offsets.",
-#             "shares_count": 0,
-#             "slug": "process-pod-logs-with-global-increments-and-pop-min",
-#             "source_content_private": false,
-#             "tags": [
-#                 "Coding & Algorithms",
-#                 "Heaps & Priority Queues"
-#             ],
-#             "title": "Process pod logs with global increments and pop-min",
-#             "topics": [
-#                 {
-#                     "confidence": 0.95,
-#                     "is_primary": true,
-#                     "level": 3,
+#             "content_enhanced": "Solve the following interview-style problems:\n\n1. **Function signature matching**\n   
+# You are given a registry of function definitions. Each function has an ordered parameter list where parameters may be **required**,
+#  **optional**, or a trailing **variadic** parameter. Given a candidate call signatur",
+# 
+#             "seo_summary": "This multi-part prompt evaluates skills in function signature and type matching, 
+# resource-constrained file I/O and streaming for large files, and data-structure design for randomized queues including multiset equality, 
+# synchronization, and compact run-length encodings.",
+#            
+#             "seo_summary": "This question evaluates understanding of data structures\u2014particularly priority queues/heaps\u2014and techniques 
+# for efficiently handling global/bulk updates and minimum extraction under changing offsets.",
+#             
 #                     "name": "Heaps & Priority Queues",
 #                     "slug": "heaps"
-#                 }
-#             ],
-#             "total_likes": 20,
-#             "updated_at": "2026-06-27T04:42:32.061122",
-#             "user_id": 1,
-#             "views_count": 230
-#         }
-#     ],
-#     "ranking_policy": "pop2|questions_feed|rank:new|pers:0|dith:0|seed:0",
-#     "topic": null
 
 
 ###################################
@@ -568,6 +294,153 @@ W:  W[i] > 0  : load an item ofW[i]
   ]
 }
 """
+class Solution:
+    def canReachTarget(weights: list[int], target: int) -> bool:
+        n = len(weights)
+
+        if target == 0:
+            return True
+
+        if n == 0:
+            return target == 0        
+
+        memo = {}
+        def canLoad(current_load: int, used_mask: int):
+            if current_load == target:
+                return True
+
+            key = (current_load, used_mask)
+            if  key in memo:
+                return memo[key]
+
+            for i, w in enumerate(weights):
+                new_item_mask = 1 << i
+                if not (used_mask & new_item_mask):
+                    new_mask = used_mask | new_item_mask
+                    new_load = current_load + w
+
+                    if new_load > 0:
+                      if canLoad(new_load, new_mask):
+                        memo[key] = True
+
+                        return memo[key]    
+                      
+            
+            memo[key] = False
+            return False
+                
+        return canLoad(0, 0)
+# Complexity AnalysisTime Complexity: $O(N * S)
+# where N is the number of elements in W and 
+# S is the number of distinct reachable sums (bounded by 2^N in the worst case, or $\text{range of possible sums}$ when using DP).Space Complexity: $O(S)$ to store the set of reachable intermediate totals.
+
+
+"""
+Given bank transactions, positive for credits and negative for debits, determine whether any subset sums to a target balance. Each transaction can be used once. How would you improve on checking every subset?
+For example, [7, -3, 5, -2] with 4 returns true because 7 + (-3) = 4. 
+
+=> subset sum
+"""
+def getTarget(transactions: list[int], target: int) -> bool:
+    if not transactions:
+        return False
+
+    reachable = {0}
+
+    for tx in transactions:
+        # Create new sums without mutating reachable during iteration
+        new_sums = {current + tx for current in reachable}
+        
+        # Check early exit condition
+        if target in new_sums:
+            return True
+            
+        reachable.update(new_sums)
+
+    return False
+
+# another way
+def canReachTarget(weights: list[int], target: int) -> bool:
+    memo = {}
+
+    def dfs(index: int, current_load: int) -> bool:
+        if current_load == target:
+            return True
+        if index == len(weights):
+            return False
+
+        key = (index, current_load)
+        if key in memo:
+            return memo[key]
+
+        # Option 1: Include current weight
+        if dfs(index + 1, current_load + weights[index]):
+            memo[key] = True
+            return True
+
+        # Option 2: Exclude current weight
+        if dfs(index + 1, current_load):
+            memo[key] = True
+            return True
+
+        memo[key] = False
+        return False
+
+    return dfs(0, 0)
+###################################
+# * Given sorted event timestamps, count events in (t - W, t] for each event. For [1, 2, 4, 7] and W = 3, return [1, 2, 2, 1]. Can you do it in O(n)?
+
+"""
+Sample TestsTest 1Input: timestamps = [1, 2, 4, 7], W = 3
+Output: [1, 2, 2, 1]
+
+Explanation:For $t = 1$: Window is $(1 - 3, 1] = (-2, 1]$.  Events in window: [1] $\rightarrow$ count = 1.
+
+For $t = 2$: 
+Window is $(2 - 3, 2] = (-1, 2]$. Events in window: [1, 2] $\rightarrow$ count = 2.
+
+For $t = 4$: Window is $(4 - 3, 4] = (1, 4]$. Events in window: [2, 4] $\rightarrow$ 
+count = 2 (event at 1 is excluded because $1 \le 1$ is false for strictly greater than $t - W$).
+
+For $t = 7$: Window is $(7 - 3, 7] = (4, 7]$. Events in window: [7] $\rightarrow$ count = 1.
+
+
+Test 2 (Duplicate Timestamps)Input: timestamps = [1, 1, 2, 3], W = 1
+output: [2, 2, 3, 2]
+
+Explanation:For $t = 1$: Window $(0, 1]$. Events: [1, 1] $\rightarrow$ count = 2.
+For $t = 1$: Window $(0, 1]$. Events: [1, 1] $\rightarrow$ count = 2.
+For $t = 2$: Window $(1, 2]$. Events: [2] $\rightarrow$ count = 1 (or [1, 1, 2] depending on condition; 
+here $(1, 2]$ excludes timestamps $\le 1$, so count = 1).$O(N)$ 
+
+Solution Approach: Two Pointers / Sliding WindowSince timestamps is already sorted, we can maintain a left pointer left that points to the first event currently inside the valid window $(t_i - W, t_i]$.As the right pointer right moves from $0$ to $N-1$:We advance left while timestamps[right] - timestamps[left] >= W.The number of events in the window for timestamps[right] is simply:$$\text{count} = \text{right} - \text{left} + 1$$Because both left and right pointers move forward at most $N$ times, the overall time
+"""
+class Solution:
+  def countEvent(time_stamp: list[int], window: int) -> list[int]:
+    n = len(time_stamp)
+
+    if n == 0 or window <= 0:
+      return []
+
+    if n == 1:
+        return [1]
+
+    left, right = 0, 0
+    result = [1] * n
+    while right < n:
+        while time_stamp[right] - time_stamp[left] >= window:
+            left += 1
+
+        if time_stamp[right] == time_stamp[left]:
+            result[left] += 1
+        result[right] = right - left + 1
+
+        right += 1
+
+    return result
+
+
+###################################
 
 
 ###################################
@@ -604,6 +477,9 @@ W:  W[i] > 0  : load an item ofW[i]
 """
 Insufficient details: only mentions a 'monster cost' problem solvable via DFS/BFS with a follow-up identical to the original; 
 missing concrete I/O, cost definition, and constraints, so it is omitted.
+
+"This question evaluates competency in efficient file I/O and streaming techniques for implementing tail, 
+# and in graph search and shortest-path algorithms with path reconstruction for computing minimum monster cost in a grid.",
 """
 
 ###################################
