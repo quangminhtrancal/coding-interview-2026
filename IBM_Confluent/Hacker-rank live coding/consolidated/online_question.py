@@ -482,6 +482,155 @@ missing concrete I/O, cost definition, and constraints, so it is omitted.
 # and in graph search and shortest-path algorithms with path reconstruction for computing minimum monster cost in a grid.",
 """
 
+# The example text matches Confluent interview questions listed on PracHub, which are titled "Implement Tail and Find Monster Cost" 
+# and "Solve constrained monster traversal". The tail half is well documented. 
+# The monster half is only a vague summary, so the grid version below is a reasonable reconstruction.
+
+# Part 1: Implement tail -n (streaming)
+
+# The version I found gives you a huge newline-delimited file and a limited API (read(k), movePointer(pos), getSize()). 
+# You must print the last N lines without reading the whole file, and discuss buffer scanning versus moving the pointer often. 
+# prachub
+
+# Approach: start at the end of the file and read fixed-size blocks backwards, prepending each block. Stop once you have seen more than N newlines, 
+# then keep the last N lines.
+
+# python
+def tail(path: str, n: int, block: int = 8192) -> list[str]:
+    if n <= 0:
+        return []
+    
+    with open(path, "rb") as f:
+        f.seek(0, 2)
+        pos = f.tell()                      # getSize()
+        data = b""
+
+        while pos > 0 and data.count(b"\n") <= n:
+            step = min(block, pos)
+            pos -= step
+            f.seek(pos)                     # movePointer(pos)
+            data = f.read(step) + data      # read(k)
+        lines = data.split(b"\n")
+        if lines and lines[-1] == b"":      # trailing newline
+            lines.pop()
+        return [l.decode("utf-8", "replace") for l in lines[-n:]]
+    
+# Time and space: you read roughly the size of the last N lines plus one block, so the cost is O(size of the tail), not O(file size).
+# Bytes, not characters: \n never appears inside a multi-byte UTF-8 sequence, so splitting on bytes and decoding each line afterwards is safe.
+# Trailing newline: this is the main edge case. Require more than N newlines so the first line you keep is complete.
+# Tradeoff (large buffer vs frequent seeks): a bigger block means fewer syscalls and seeks but more wasted bytes read. 
+# A tiny block, such as one byte at a time, means many seeks, which is slow. Something like 4–64 KB matches the disk page size.
+# Stream variant (stdin or pipe, no seeking): keep a collections.deque(maxlen=n) and iterate lines. This is O(n) memory and one pass.
+# python
+
+from collections import deque
+def tail_stream(lines, n):
+    return list(deque(lines, maxlen=n)) if n > 0 else []
+
+# Part 2: "Monster minimum cost"
+
+# The grid wording ("graph search and shortest-path with path reconstruction") 
+# suggests this: you move from the start to the goal, entering a cell costs the monster there, 
+# and you want the minimum total cost plus the path. Dijkstra handles this. 
+# BFS or DFS only works if every cell costs the same.
+# Dijkstra algorithm
+
+import heapq
+
+def min_monster_cost(grid, start, goal):
+    R, C = len(grid), len(grid[0])
+    INF = float("inf")
+    dist = [[INF] * C for _ in range(R)]
+
+    parent = {}
+    sr, sc = start
+    dist[sr][sc] = grid[sr][sc]
+
+    pq = [(grid[sr][sc], sr, sc)]
+
+    while pq:
+        d, r, c = heapq.heappop(pq)
+        if d > dist[r][c]:
+            continue
+        if (r, c) == goal:
+            break
+        for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < R and 0 <= nc < C and grid[nr][nc] >= 0:  # -1 = wall
+                nd = d + grid[nr][nc]
+                if nd < dist[nr][nc]:
+                    dist[nr][nc] = nd
+                    parent[(nr, nc)] = (r, c)
+                    heapq.heappush(pq, (nd, nr, nc))
+
+    if dist[goal[0]][goal[1]] == INF:
+        return -1, []
+    path, cur = [goal], goal
+    while cur != start:
+        cur = parent[cur]
+        path.append(cur)
+    return dist[goal[0]][goal[1]], path[::-1]
+
+
+### Dijistra implementation
+import heapq
+
+def dijkstra(graph: dict, start_node: str | int) -> tuple[dict, dict]:
+    """
+    Computes shortest path distances from a start node to all other nodes.
+    
+    :param graph: Adjacency list representation {node: [(neighbor, weight), ...]}
+    :param start_node: The starting node
+    :return: A tuple of (distances, previous_nodes)
+    """
+    # Initialize distances with infinity
+    distances = {node: float('inf') for node in graph}
+    distances[start_node] = 0
+    
+    # Store shortest path tree for reconstructing paths
+    previous_nodes = {node: None for node in graph}
+    
+    # Priority Queue stores tuples of: (current_distance, node)
+    pq = [(0, start_node)]
+    
+    while pq:
+        current_distance, current_node = heapq.heappop(pq)
+        
+        # If we found a longer path than already recorded, skip
+        if current_distance > distances[current_node]:
+            continue
+            
+        for neighbor, weight in graph[current_node]:
+            distance = current_distance + weight
+            
+            # Found a shorter path to neighbor
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous_nodes[neighbor] = current_node
+                heapq.heappush(pq, (distance, neighbor))
+                
+    return distances, previous_nodes
+
+
+def reconstruct_path(previous_nodes: dict, target_node: str | int) -> list:
+    """Helper function to reconstruct the path from start to target."""
+    path = []
+    curr = target_node
+    while curr is not None:
+        path.append(curr)
+        curr = previous_nodes[curr]
+    return path[::-1] # Reverse path so it goes start -> target
+
+# Complexity: O(RC log(RC)) time and O(RC) space.
+# Path reconstruction: store a parent pointer whenever you relax a cell, then walk back from the goal.
+# Simplification: if you can only move right or down, plain DP is enough (dp[r][c] = cost + min(dp[r-1][c], dp[r][c-1])).
+# The other variant: "constrained monster traversal"
+
+# The PracHub listing describes this one as a directed graph of n rooms, labeled 0..n-1, where each room i has a monster with health hp[i] ≥ 0. The snippet cuts off before the constraint, so I can't say exactly what it is. It is probably a "minimum starting strength" or "cheapest route" question. If it turns out to be a state-dependent search, the usual move is to add the constraint to the Dijkstra state, as in (cost, room, extra_state). 
+# prachub
+
+
+
 ###################################
 
 """
@@ -1351,6 +1500,103 @@ One detail to confirm from the full prompt: whether a variadic function with an 
 }
 """
 
+# Semantics
+# Non-variadic: the argument count must equal the parameter count, and the types must match position by position.
+# Variadic: the last parameter is the repeatable type and the ones before it are fixed. So ["Integer"] with is_card=True means 0 fixed parameters plus Integer*. The call needs at least len(params) - 1 arguments, the fixed ones must match exactly, and every remaining argument must equal the last parameter type.
+# Variadic with empty params: the spec leaves this open. I reject it at registration, because there is no type to repeat.
+# Straightforward version: O(n·m) per lookup
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Function:
+    name: str
+    params: tuple
+    is_card: bool = False
+
+
+class FunctionRegistry:
+    def __init__(self):
+        self.functions = []
+
+    def register(self, name, params, is_card=False):
+        if is_card and not params:
+            raise ValueError("variadic function needs at least one parameter type")
+        self.functions.append(Function(name, tuple(params), is_card))
+
+    def match(self, args):
+        return [f for f in self.functions if self._matches(f, args)]
+
+    @staticmethod
+    def _matches(f, args):
+        if not f.is_card:
+            return list(f.params) == list(args)
+
+        fixed, var_type = f.params[:-1], f.params[-1]
+        if len(args) < len(fixed):
+            return False
+        if tuple(args[:len(fixed)]) != fixed:
+            return False
+        return all(a == var_type for a in args[len(fixed):])
+# Faster version: lookups independent of n
+
+# Hash the signatures, so a query never scans all registered functions.
+
+# Exact functions go in exact[tuple(params)].
+# Variadic functions go in var_typed[(fixed_prefix, var_type)] and in var_any[fixed_prefix], which handles the zero-extra-arguments case.
+# For a query with m args, the trailing run of identical types starting at position s is the only place a variadic tail can begin. So only the split points k in [s, m] need to be checked.
+
+from collections import defaultdict
+
+
+class FastFunctionRegistry:
+    def __init__(self):
+        self._count = 0
+        self.exact = defaultdict(list)       # params -> [(order, Function)]
+        self.var_typed = defaultdict(list)   # (fixed, type) -> [(order, Function)]
+        self.var_any = defaultdict(list)     # fixed -> [(order, Function)]
+
+    def register(self, name, params, is_card=False):
+        if is_card and not params:
+            raise ValueError("variadic function needs at least one parameter type")
+        f = Function(name, tuple(params), is_card)
+        entry = (self._count, f)
+        self._count += 1
+
+        if not is_card:
+            self.exact[f.params].append(entry)
+        else:
+            fixed, var_type = f.params[:-1], f.params[-1]
+            self.var_typed[(fixed, var_type)].append(entry)
+            self.var_any[fixed].append(entry)
+
+    def match(self, args):
+        args = tuple(args)
+        m = len(args)
+        found = list(self.exact.get(args, []))
+
+        # Start of the trailing run of identical types
+        s = m
+        while s > 0 and args[s - 1] == args[m - 1]:
+            s -= 1
+
+        # Variadic with at least one extra argument: split at k, tail = args[k:]
+        for k in range(s, m):
+            found += self.var_typed.get((args[:k], args[k]), [])
+
+        # Variadic with zero extra arguments: all args are fixed parameters
+        found += self.var_any.get(args, [])
+
+        found.sort(key=lambda e: e[0])       # keep registration order
+        return [f for _, f in found]
+
+# Per lookup this costs O(m²) worst case, because it builds tuple slices, and it does not depend on n. If you replace the dicts with a trie over the parameter types, it becomes O(m).
+
+# Complexity
+# 	Straightforward	Indexed
+# Lookup	O(n·m)	about O(m²) (O(m) with a trie), independent of n
+# Space	O(n·m)	O(n·m)                        
 
 ###################################
 
@@ -1453,6 +1699,68 @@ search("cloud monitoring") >> This should output [2]
 search("Cloud computing is") >> This should output [1,3]
 """
 
+import re
+from collections import defaultdict
+
+
+class PhraseSearchIndex:
+    def __init__(self):
+        # term -> {doc_id -> [positions]}
+        self.index = defaultdict(lambda: defaultdict(list))
+
+    @staticmethod
+    def _tokenize(text: str) -> list[str]:
+        return re.findall(r"\w+", text.lower())
+
+    def add_document(self, doc_id: int, text: str) -> None:
+        for pos, term in enumerate(self._tokenize(text)):
+            self.index[term][doc_id].append(pos)  # positions come out sorted
+
+    def search(self, phrase: str) -> list[int]:
+        terms = self._tokenize(phrase)
+        if not terms:
+            return []
+
+        # Any missing term means no document can match
+        postings = []
+        for t in terms:
+            if t not in self.index:
+                return []
+            postings.append(self.index[t])
+
+        # Candidate docs: intersect starting from the rarest term (smallest list)
+        smallest = min(postings, key=len)
+        candidates = set(smallest)
+        for p in postings:
+            candidates &= p.keys()
+            if not candidates:
+                return []
+
+        # Verify the words appear consecutively in each candidate doc
+        result = []
+        for doc_id in candidates:
+            later = [set(p[doc_id]) for p in postings[1:]]  # O(1) lookups
+            for start in postings[0][doc_id]:
+                if all((start + i + 1) in later[i] for i in range(len(later))):
+                    result.append(doc_id)
+                    break
+        return sorted(result)
+
+
+# ---- Demo ----
+docs = {
+    1: "Cloud computing is the on-demand availability of computer system resources.",
+    2: "One integrated service for metrics uptime cloud monitoring dashboards and alerts reduces time spent navigating between systems.",
+    3: "Monitor entire cloud infrastructure, whether in the cloud computing is or in virtualized data centers.",
+}
+
+idx = PhraseSearchIndex()
+for d_id, text in docs.items():
+    idx.add_document(d_id, text)
+
+print(idx.search("cloud"))               # [1, 2, 3]
+print(idx.search("cloud monitoring"))    # [2]
+print(idx.search("Cloud computing is"))  # [1, 3]
 ###################################
 
 """
