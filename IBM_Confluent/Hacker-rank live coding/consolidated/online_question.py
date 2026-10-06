@@ -577,7 +577,8 @@ W:  W[i] > 0  : load an item ofW[i]
 """
 {
   "title": "Print Last N Lines (Tail Utility)",
-  "description": "Read an integer N, then process the remaining stream or file input to print the final N lines in their original order while maintaining bounded memory usage.",
+  "description": "Read an integer N, then process the remaining stream or file input to print the final N lines in 
+   their original order while maintaining bounded memory usage.",
   "algorithm_strategy": {
     "name": "Streaming Queue / Ring Buffer",
     "steps": [
@@ -608,20 +609,20 @@ missing concrete I/O, cost definition, and constraints, so it is omitted.
 ###################################
 
 """
-The Random Queue ADT on this page behaves like a queue in how items are added, but unlike a FIFO queue, each removal chooses uniformly at random from the items currently present.
+The Random Queue ADT on this page behaves like a queue in how items are added, but unlike a FIFO queue, 
+each removal chooses uniformly at random from the items currently present.
 
 Part A: Core behavior
 
-enqueue(x)
-: addx
+enqueue(x): addx
 .
-dequeue()
-: choose one current item uniformly, remove it, and return it.
-peek()
-(optional): return a random item without removing it.
-size()
-: return the number of items.
-A common design is to store items in a dynamic array. To dequeue, choose a random index, save that item, replace its slot with the last item, and remove the last slot. This avoids shifting elements. Under the usual assumption that random-index generation is constant time, enqueue and dequeue are expected O(1); storage is O(n).
+dequeue(): choose one current item uniformly, remove it, and return it.
+
+peek()(optional): return a random item without removing it.
+size(): return the number of items.
+A common design is to store items in a dynamic array. To dequeue, choose a random index, save that item, 
+replace its slot with the last item, and remove the last slot. This avoids shifting elements. Under the usual assumption that 
+random-index generation is constant time, enqueue and dequeue are expected O(1); storage is O(n).
 
 dequeue
 
