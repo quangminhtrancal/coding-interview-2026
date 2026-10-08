@@ -13,6 +13,12 @@
 # https://www.hack2hire.com/question-bank/companies/confluent/interview-resources/68e6a799605ab8e9546847e8
 # https://crackmlinterview.com/company/confluent
 
+Clarify -> Plan -> Execute -> Test
+
+'''
+bisect.insort run time is O(n) 
+bisect_left; bisect_right is O(logn)
+'''
 
 # // You are building an App that lets the users determine the most cost-effective order that they can place in a restaurant for the food items that they want to have. You have the menu of the restaurant that contains item name, and it's price. The restaurant can also offer Value Meals, which are groups of several items, at a discounted price. Write a program that accepts a list of menu items, and a list of items that the user wants to eat, and outputs the best price at which they can get all of their desired items.
 # // [Constraint: The user can order a maximum of 3 unique items.]
@@ -200,20 +206,101 @@
 
 
 
+'''
+Qualifier Round:
+Given a window size,
+perform get, put, and average operation
+items that were added before the window size should be removed while taking average as well, and also during get operation, return null if item expired.
+window size 1hr
+00:00 put("A",10)
+00:10 put("B",20)
+00:30 average() -> 15
+01:05 average () -> 20
+01:08 get("B") -> 20
+01:15 put("A",30)
+01:50 average -> 30
+
+Here is a clean Python solution using a doubly-linked list with a hash map (similar to an LRU Cache layout) 
+alongside running sums to handle all operations in $O(1)$ time complexity.
+'''
 
 
-# Qualifier Round:
-# Given a window size,
-# perform get, put, and average operation
-# items that were added before the window size should be removed while taking average as well, and also during get operation, return null if item expired.
-# window size 1hr
-# 00:00 put("A",10)
-# 00:10 put("B",20)
-# 00:30 average() -> 15
-# 01:05 average () -> 20
-# 01:08 get("B") -> 20
-# 01:15 put("A",30)
-# 01:50 average -> 30
+
+class Node:
+    def __init__(self, key: str, val: float, timestamp: int):
+        self.key = key
+        self.val = val
+        self.timestamp = timestamp
+        self.prev = None
+        self.next = None
+
+class SlidingWindowCache:
+    def __init__(self, window_seconds: int = 3600):
+        self.window = window_seconds
+        self.cache = {}  # key -> Node
+        
+        # Doubly Linked List to track insertion order / timestamps
+        self.head = Node("", 0, 0)  # Dummy head (oldest)
+        self.tail = Node("", 0, 0)  # Dummy tail (newest)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        
+        self.running_sum = 0.0
+        self.running_count = 0
+
+    def _add_to_tail(self, node: Node):
+        """Insert a node at the end of the doubly linked list."""
+        node.prev = self.tail.prev
+        node.next = self.tail
+        self.tail.prev.next = node
+        self.tail.prev = node
+
+    def _remove_node(self, node: Node):
+        """Remove a node from the doubly linked list."""
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def _evict_expired(self, current_time: int):
+        """Remove all nodes outside the sliding time window."""
+        while self.head.next != self.tail:
+            oldest = self.head.next
+            if current_time - oldest.timestamp >= self.window:
+                self._remove_node(oldest)
+                del self.cache[oldest.key]
+                self.running_sum -= oldest.val
+                self.running_count -= 1
+            else:
+                break
+
+    def put(self, key: str, value: float, current_time: int):
+        self._evict_expired(current_time)
+        
+        # If key already exists, remove old record first
+        if key in self.cache:
+            old_node = self.cache[key]
+            self._remove_node(old_node)
+            self.running_sum -= old_node.val
+            self.running_count -= 1
+        
+        new_node = Node(key, value, current_time)
+        self.cache[key] = new_node
+        self._add_to_tail(new_node)
+        self.running_sum += value
+        self.running_count += 1
+
+    def get(self, key: str, current_time: int):
+        self._evict_expired(current_time)
+        
+        if key not in self.cache:
+            return None
+        return self.cache[key].val
+
+    def average(self, current_time: int) -> float:
+        self._evict_expired(current_time)
+        
+        if self.running_count == 0:
+            return 0.0
+        return self.running_sum / self.running_count
 
 # Onsite 1: Implement a Word Search Engine, given a list of documents with text, return the document ids that the given word belongs in. Followup: Search a phrase
 # Onsite 2: Implement the Unix Tail -N Command
@@ -359,7 +446,7 @@ def getTarget(transactions: list[int], target: int) -> bool:
 
     return False
 
-# another way
+# ANOTHER WAY
 def canReachTarget(weights: list[int], target: int) -> bool:
     memo = {}
 
@@ -469,8 +556,39 @@ class Solution:
     "Avoid loading the entire file into memory; memory usage should be strictly bounded by N lines."
   ]
 }
-"""
 
+===========
+Why threads don't help
+
+The work is a sequential scan of a stream, and the result depends on line order. You can't know which lines 
+are "last" until you've seen the end.
+It's I/O-bound, and the per-line work (one deque.append) is trivial. In CPython the GIL also prevents CPU-parallel speedup.
+
+If you need thread safety (say, one thread reads while another polls the current tail), deque.append is atomic in CPython, 
+but a lock makes the intent explicit and makes snapshots consistent:
+"""
+import threading
+from collections import deque
+
+
+class TailBuffer:
+    """Thread-safe bounded buffer holding the last n lines."""
+
+    def __init__(self, n):
+        self._buf = deque(maxlen=n) if n > 0 else None
+        self._lock = threading.Lock()
+
+    def add(self, line):
+        if self._buf is None:
+            return
+        with self._lock:
+            self._buf.append(line)
+
+    def snapshot(self):
+        if self._buf is None:
+            return []
+        with self._lock:
+            return list(self._buf)
 
 ###################################
 
@@ -655,11 +773,7 @@ on an empty queue needs a defined behavior, such as throwing an exception or ret
 
 First decide what equality means. A natural choice is multiset equality: two queues are equal if they contain the same values with the same multiplicities, regardless of storage order. For example,
 
-[a, a, b]
-
-equals[b, a, a]
-
-, but not[a, b, b]
+[a, a, b] equals[b, a, a] , but not[a, b, b]
 
 .If elements are hashable, compare sizes and frequency maps. If you sort copies instead, comparison takes O(n log n). Avoid mutating the queues while checking equality.
 
@@ -667,21 +781,26 @@ Part C: Thread safety
 
 The random choice and removal must be one atomic operation. Otherwise, another thread could change the queue between reading its size, choosing an index, and removing the item. Protect related operations with a lock, or use a carefully designed concurrent structure. Decide whether
 
-size()
-
-andpeek()
+size() and  peek()
 
 need a consistent snapshot, and document the guarantee. A basic lock around each operation provides simple linearizable behavior.Part D: RLE-backed equality
 
-For run-length encoding, compare the represented multisets without expanding all repeated elements. Aggregate counts per value across runs, since the same value may appear in multiple runs—even in different positions or split into different run lengths. Then compare the aggregated counts for both queues. This takes time proportional to the number of runs plus the number of distinct values, with space proportional to the number of distinct values.
+For run-length encoding, compare the represented multisets without expanding all repeated elements. 
+Aggregate counts per value across runs, since the same value may appear in multiple runs—even in different positions or 
+split into different run lengths. Then compare the aggregated counts for both queues. 
 
-The exact comparison method depends on the element types and whether hashing or ordering is available. I couldn’t find a separate Confluent question-bank entry for this prompt; the available Confluent interview experiences may provide related context. 
+This takes time proportional to the number of runs plus the number of distinct values, 
+with space proportional to the number of distinct values.
 
+The exact comparison method depends on the element types and whether hashing or ordering is available. 
+I couldn’t find a separate Confluent question-bank entry for this prompt; 
+the available Confluent interview experiences may provide related context. 
 
 
 {
   "title": "Random Queue ADT",
-  "description": "A Random Queue Abstract Data Type behaves like a standard queue when adding items, but removes elements uniformly at random rather than following First-In, First-Out (FIFO) ordering.",
+  "description": "A Random Queue Abstract Data Type behaves like a standard queue when adding items, 
+  but removes elements uniformly at random rather than following First-In, First-Out (FIFO) ordering.",
   "sections": {
     "part_a_core_behavior": {
       "title": "Core Behavior & Operations",
@@ -705,15 +824,18 @@ The exact comparison method depends on the element types and whether hashing or 
       ],
       "implementation_details": {
         "underlying_structure": "Dynamic Array",
-        "removal_strategy": "Select a random index, store its value, overwrite the slot with the last element in the array, and pop the last slot. This eliminates array shifting.",
+        "removal_strategy": "Select a random index, store its value, overwrite the slot with the last element in the array, 
+        and pop the last slot. This eliminates array shifting.",
         "time_complexity": "O(1) expected for enqueue and dequeue (assuming O(1) random index generation).",
         "space_complexity": "O(n) space.",
-        "edge_cases": "Calling dequeue() on an empty queue must have defined error handling (e.g., throwing an exception or returning an optional/null value)."
+        "edge_cases": "Calling dequeue() on an empty queue must have defined error handling (e.g., 
+        throwing an exception or returning an optional/null value)."
       }
     },
     "part_b_equality": {
       "title": "Equality Logic",
-      "definition": "Multiset Equality: Two random queues are equal if they contain the exact same elements with identical frequencies/multiplicities, regardless of internal storage order.",
+      "definition": "Multiset Equality: Two random queues are equal if they contain the exact same elements 
+      with identical frequencies/multiplicities, regardless of internal storage order.",
       "examples": {
         "equal": ["[a, a, b]", "[b, a, a]"],
         "not_equal": ["[a, a, b]", "[a, b, b]"]
@@ -734,25 +856,123 @@ The exact comparison method depends on the element types and whether hashing or 
     },
     "part_c_thread_safety": {
       "title": "Thread Safety & Concurrency",
-      "atomic_operations": "Random index selection and item removal must occur as a single atomic operation to prevent race conditions where queue size or content changes mid-operation.",
+      "atomic_operations": "Random index selection and item removal must occur as a single atomic operation 
+      to prevent race conditions where queue size or content changes mid-operation.",
       "concurrency_strategies": [
-        "Reentrant/Mutex Locks: Wrap each public method (enqueue, dequeue, peek, size) in a lock to guarantee simple linearizable behavior.",
-        "Snapshot Guarantees: Decide and document whether size() and peek() reflect a consistent point-in-time snapshot of the queue."
+        "Reentrant/Mutex Locks: Wrap each public method (enqueue, dequeue, peek, size) in a lock to 
+        guarantee simple linearizable behavior.",
+        "Snapshot Guarantees: Decide and document whether size() and peek() reflect a consistent 
+        point-in-time snapshot of the queue."
       ]
     },
     "part_d_rle_backed_equality": {
       "title": "Run-Length Encoding (RLE) Equality",
-      "description": "Compare multisets directly from run-length encoded representations without expanding repeated elements into memory.",
-      "algorithm": "Aggregate total counts per distinct value across all runs (since identical values can appear in separate runs or vary in run lengths), then compare aggregated counts between queues.",
+      "description": "Compare multisets directly from run-length encoded representations without expanding 
+      repeated elements into memory.",
+      "algorithm": "Aggregate total counts per distinct value across all runs (since identical values 
+      can appear in separate runs or vary in run lengths), then compare aggregated counts between queues.",
       "time_complexity": "O(R + V), where R is total runs and V is total distinct values.",
       "space_complexity": "O(V) to store aggregated frequency counts."
     }
   }
 }
+
+===> **************** answer:
+https://share.gemini.google/oQtR9RD6RsNZ 
+"""
+import random
+import threading
+from typing import TypeVar, Generic, Optional
+
+T = TypeVar('T')
+
+"""
+threading.RLock() is a reentrant lock: the thread that already holds it can acquire it again without blocking itself. 
+A plain threading.Lock() would deadlock in that situation.
+"""   
+
+class RandomQueue(Generic[T]):
+    def __init__(self) -> None:
+        self._items: list[T] = []
+        self._lock = threading.RLock()     
+
+    def enqueue(self, item: T) -> None:
+        """Appends an item in O(1) amortized time."""
+        with self._lock:
+            self._items.append(item)
+
+    def dequeue(self) -> T:
+        """
+        Removes and returns a uniformly random item in O(1) time.
+        Throws IndexError if queue is empty.
+        """
+        with self._lock:
+            if not self._items:
+                raise IndexError("dequeue from an empty RandomQueue")
+            
+            # Select random index
+            rand_idx = random.randint(0, len(self._items) - 1)
+            last_idx = len(self._items) - 1
+            
+            # Swap target element with last element
+            self._items[rand_idx], self._items[last_idx] = (
+                self._items[last_idx],
+                self._items[rand_idx],
+            )
+            
+            # Pop last element in O(1)
+            return self._items.pop()
+
+    def peek(self) -> T:
+        """
+        Returns a uniformly random item without removing it.
+        Throws IndexError if queue is empty.
+        """
+        with self._lock:
+            if not self._items:
+                raise IndexError("peek from an empty RandomQueue")
+            rand_idx = random.randint(0, len(self._items) - 1)
+            return self._items[rand_idx]
+
+    def size(self) -> int:
+        """Returns the current number of elements."""
+        with self._lock:
+            return len(self._items)
+
+    def is_empty(self) -> bool:
+        with self._lock:
+            return len(self._items) == 0
+
+    def __iter__(self):
+        """Allows non-destructive snapshots of elements for equality checks."""
+        with self._lock:
+            return iter(list(self._items))
+
+###################################
+"""
+Minimum Health Required for Gaming
+A person wants to play a game with the goal of defeating opponents at each level. 
+Initially, there are 'n' opponents at the first level, with initial_players[i] 
+corresponding to each opponent's strength. 
+
+Then, a list named next_players is provided, representing the strength of players added with each new level. 
+The goal is to defeat the player ranked at 'rank' in terms of strength at each level (as new players are added, 
+the positions of existing players do not change). Each time an opponent is defeated, 
+the player's health decreases by that opponent's strength. 
+To ensure survival till the end, the task is to find the minimum initial health required 
+so that the player's health is greater than or equal to zero at the end. 
+For this question, I maintained a min heap of size 'rank'.
+
+=====> $$$$$$$$$$$$$$$$$$$$$$$$
+
+use min heap with size of rank ==> if more than rank size, then heap just pop
 """
 
 
+
 ###################################
+
+
 
 """
 The problem on your current page is “Text Search: search a word, then search a phrase (follow-up).” It asks you to tokenize a multi-line text and answer two kinds of queries:
@@ -801,7 +1021,8 @@ in the worst case for that phrase. With many queries, reuse preprocessing: build
 
 {
   "title": "Text Search: Single Word & Consecutive Phrase Matching",
-  "description": "Tokenize a multi-line text input and efficiently answer search queries for individual words and multi-word phrases.",
+  "description": "Tokenize a multi-line text input and efficiently answer search queries 
+  for individual words and multi-word phrases.",
   "tokenization_rules": {
     "delimiter": "Split on any non-alphanumeric character (e.g., spaces, punctuation, symbols).",
     "case_sensitivity": "Case-insensitive (convert all tokens to lowercase during normalization).",
@@ -861,6 +1082,108 @@ in the worst case for that phrase. With many queries, reuse preprocessing: build
 }
 """
 
+# Solution 1: Preprocessed Frequency Map + Sliding Window (Direct Approach)This approach tokenizes 
+# the multi-line text into a flat stream of normalized tokens, builds a frequency map for $O(1)$ WORD lookups, 
+# and uses a sliding window for PHRASE lookups.
+
+import re
+from collections import Counter
+
+class TextSearchEngine:
+    def __init__(self, raw_text: str):
+        # Tokenize on non-alphanumeric characters and convert to lowercase
+        self.tokens: list[str] = [token.lower() for token in re.split(r'[^a-zA-Z0-9]+', raw_text) if token]
+        
+        # Precompute frequencies for O(1) WORD queries
+        self.word_freq: Counter[str] = Counter(self.tokens)
+
+    def search_word(self, word: str) -> int:
+        """O(1) lookup for single word counts."""
+        normalized_word = word.lower()
+        return self.word_freq.get(normalized_word, 0)
+
+    def search_phrase(self, phrase: str) -> int:
+        """
+        O(T * P) scanning approach.
+        T = len(self.tokens), P = len(phrase_tokens)
+        """
+        phrase_tokens = [t.lower() for t in re.split(r'[^a-zA-Z0-9]+', phrase) if t]
+        
+        if not phrase_tokens:
+            return 0
+        
+        P = len(phrase_tokens)
+        T = len(self.tokens)
+        
+        if P > T:
+            return 0
+
+        match_count = 0
+        
+        # Slide a window of length P across the text tokens
+        for i in range(T - P + 1):
+            if self.tokens[i:i + P] == phrase_tokens:
+                match_count += 1
+                
+        return match_count
+
+
+# Solution 2: Inverted Index with Positional Postings (Optimized Approach)When query volume is high, 
+# scanning the entire token stream for every phrase takes $\mathcal{O}(T \times P)$.
+# Instead, we can construct an Inverted Index mapping each word to its list of occurrences (positions). 
+# To evaluate PHRASE w1 w2 ... wK, we intersect position lists to check where $pos(w_{i+1}) = pos(w_i) + 1$.
+
+import re
+from collections import defaultdict
+
+class IndexedTextSearchEngine:
+    def __init__(self, raw_text: str):
+        # Tokenize text
+        self.tokens: list[str] = [token.lower() for token in re.split(r'[^a-zA-Z0-9]+', raw_text) if token]
+        
+        # Positional Inverted Index: word -> list of positions in text
+        self.index: dict[str, list[int]] = defaultdict(list)
+        for pos, token in enumerate(self.tokens):
+            self.index[token].append(pos)
+
+    def search_word(self, word: str) -> int:
+        """O(1) lookup returning total frequency."""
+        normalized_word = word.lower()
+        return len(self.index.get(normalized_word, []))
+
+    def search_phrase(self, phrase: str) -> int:
+        """
+        Intersects position lists of constituent phrase words.
+        Time Complexity: O(min(L1, L2, ...)) where L_i is the posting list length of word_i.
+        """
+        phrase_tokens = [t.lower() for t in re.split(r'[^a-zA-Z0-9]+', phrase) if t]
+        if not phrase_tokens:
+            return 0
+
+        # If any word in phrase doesn't exist in text, count is 0
+        for token in phrase_tokens:
+            if token not in self.index:
+                return 0
+
+        # Start candidate starting positions with occurrences of the first word
+        candidate_positions = set(self.index[phrase_tokens[0]])
+
+        # Intersect expected next positions for each remaining word
+        for offset, token in enumerate(phrase_tokens[1:], start=1):
+            valid_next_positions = set()
+            for pos in self.index[token]:
+                # If pos matches (start_pos + offset), start_pos remains a candidate
+                start_pos = pos - offset
+                if start_pos in candidate_positions:
+                    valid_next_positions.add(start_pos)
+            
+            candidate_positions = valid_next_positions
+            if not candidate_positions:
+                return 0
+
+        return len(candidate_positions)
+
+    # Performance ComparisonApproachSpaceWORD TimePHRASE TimeBest ForDirect Scan$\mathcal{O}(T)$$\mathcal{O}(1)$$\mathcal{O}(T \cdot P)$Small text / Few phrase queriesInverted Index$\mathcal{O}(T)$$\mathcal{O}(1)$$\mathcal{O}(K \log K)$Large text / High query volume
 ###################################
 
 """
@@ -868,19 +1191,19 @@ Silent Sensor Detector (
 
 SensorHealth
 
-) asks you to track ping timestamps per sensor and answer whether a sensor is"STABLE"
+) asks you to track ping timestamps per sensor and answer whether a sensor is"STABLE" or "UNSTABLE"
 
-or"UNSTABLE"
+at query timeT. The prompt available on your current page is incomplete: 
+it does not define the rule for deciding stability. For example, stability might mean 
+“received a ping within the last K seconds,” but the interviewer needs to specifyK
 
-at query timeT
+, whether the boundary counts, and how to handle a sensor with no pings. 
+Don’t assume a rule until it’s clarified.Once the rule is defined, 
+a reasonable starting design is to store each sensor’s ping timestamps. 
+If pings arrive in timestamp order, you may only need the latest timestamp for a “recent ping” rule. 
 
-.The prompt available on your current page is incomplete: it does not define the rule for deciding stability. For example, stability might mean “received a ping within the last
-
-K
-
-seconds,” but the interviewer needs to specifyK
-
-, whether the boundary counts, and how to handle a sensor with no pings. Don’t assume a rule until it’s clarified.Once the rule is defined, a reasonable starting design is to store each sensor’s ping timestamps. If pings arrive in timestamp order, you may only need the latest timestamp for a “recent ping” rule. If they can arrive out of order or queries concern historical times, you’ll need more history, typically sorted per sensor.
+If they can arrive out of order or queries concern historical times, you’ll need more history, 
+typically sorted per sensor.
 
 Clarify these details with the interviewer:
 
@@ -892,8 +1215,10 @@ What are the expected scale and memory limits?
 
 {
   "title": "Silent Sensor Detector (SensorHealth)",
-  "description": "Track ping timestamps for each sensor and determine whether a given sensor is 'STABLE' or 'UNSTABLE' at a specific query time T.",
-  "status": "Incomplete Problem Definition — System requires clarification on the exact stability rule and operating parameters before final implementation.",
+  "description": "Track ping timestamps for each sensor and determine whether a given sensor is 
+  'STABLE' or 'UNSTABLE' at a specific query time T.",
+  "status": "Incomplete Problem Definition — System requires clarification on the exact stability rule 
+  and operating parameters before final implementation.",
   "core_functionality": {
     "primary_task": "Ingest sensor ping events and answer stability health checks at arbitrary time points.",
     "output_states": [
@@ -925,6 +1250,89 @@ What are the expected scale and memory limits?
 }
 """
 
+import bisect
+from collections import defaultdict
+from typing import Dict, List, Literal
+
+Status = Literal["STABLE", "UNSTABLE"]
+
+
+class SensorHealth:
+    """Tracks ping timestamps per sensor and determines stability health.
+
+    Assumptions (configurable based on interviewer feedback):
+    - Default stability rule: Sensor is STABLE if it received at least 1 ping in [T - K, T].
+    - Window K default: 10 seconds.
+    - Inclusive boundaries: [T - K, T].
+    - Unknown/Unseen sensors: Return 'UNSTABLE'.
+    - Handles out-of-order pings by maintaining sorted ping histories per sensor.
+    """
+
+    def __init__(self, window_k: float = 10.0):
+        self.window_k = window_k
+        # Maps sensor_id -> sorted list of ping timestamps
+        self.pings: Dict[str, List[float]] = defaultdict(list)
+
+    def record_ping(self, sensor_id: str, timestamp: float) -> None:
+        """Records a ping timestamp for a sensor.
+
+        Handles both in-order and out-of-order ping arrivals in O(log P) time.
+        """
+        history = self.pings[sensor_id]
+        # Maintain sorted order using binary search insertion
+        bisect.insort(history, timestamp)
+
+    def is_stable(self, sensor_id: str, query_time: float) -> Status:
+        """Determines if a sensor is STABLE or UNSTABLE at a given query time T.
+
+        Calculates whether a ping exists in the range [query_time - K, query_time].
+
+        Time Complexity: O(log P) where P is the number of pings for the sensor.
+        Space Complexity: O(P) total stored pings.
+        """
+        if sensor_id not in self.pings or not self.pings[sensor_id]:
+            return "UNSTABLE"
+
+        history = self.pings[sensor_id]
+
+        # Find the rightmost ping that occurred at or before query_time
+        # bisect_right returns the insertion index for query_time
+        idx = bisect.bisect_right(history, query_time)
+
+        # If idx == 0, there are no pings at or before query_time
+        if idx == 0:
+            return "UNSTABLE"
+
+        # The latest ping at or before query_time
+        latest_ping_before_t = history[idx - 1]
+
+        # Check if the latest ping falls within the inclusive window [T - K, T]
+        if query_time - self.window_k <= latest_ping_before_t <= query_time:
+            return "STABLE"
+
+        return "UNSTABLE"
+
+
+# Example Usage & Verification
+if __name__ == "__main__":
+    detector = SensorHealth(window_k=10.0)
+
+    # Ingesting out-of-order pings for sensor "S1"
+    detector.record_ping("S1", 100.0)
+    detector.record_ping("S1", 115.0)
+    detector.record_ping("S1", 105.0)  # Arrived out of order
+
+    # Queries
+    print(detector.is_stable("S1", 108.0))  # "STABLE"   (Ping at 105.0 is in range [98, 108])
+    print(detector.is_stable("S1", 120.0))  # "STABLE"   (Ping at 115.0 is in range [110, 120])
+    print(detector.is_stable("S1", 130.0))  # "UNSTABLE" (Latest ping was 115.0, outside [120, 130])
+    print(detector.is_stable("S1", 90.0))   # "UNSTABLE" (No pings prior to T=90)
+    print(detector.is_stable("UNKNOWN", 100.0))  # "UNSTABLE" (Unknown sensor)
+
+    # Alternative: O(1) Space Optimization (Strict In-Order Pings)
+    # If the interviewer clarifies that pings strictly arrive in chronological order and 
+    # queries only check the current time $T$, you can optimize memory to $O(1)$ per sensor:
+
 ###################################
 
 """
@@ -949,6 +1357,163 @@ create_time
 
 ================================
 """
+
+import bisect
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+
+@dataclass(frozen=True)
+class TokenRecord:
+    token: str
+    create_time: float
+    ttl: Optional[float] = None  # Optional Time-To-Live in seconds
+
+    def is_active(self, current_time: float) -> bool:
+        if self.ttl is None:
+            return True
+        return (self.create_time + self.ttl) > current_time
+
+
+class TokenManager:
+    """Manages token records with fast lookup by token ID and ordered retrieval by create_time.
+
+    Assumptions (configurable based on interviewer feedback):
+    - create_time is a numerical timestamp (e.g., epoch time).
+    - Multiple tokens CAN share the same create_time (handled via tuple sorting: (create_time, token)).
+    - 'Current token list' returns active tokens sorted by create_time.
+    - Non-existent token lookups return None.
+    - Soft-deletions are supported via explicit revoking.
+    """
+
+    def __init__(self, default_ttl: Optional[float] = None):
+        self.default_ttl = default_ttl
+        # Fast lookup by token string -> TokenRecord
+        self.tokens_by_id: Dict[str, TokenRecord] = {}
+        # Revoked token set for soft deletion support
+        self.revoked_tokens: set[str] = set()
+        # Sorted list of tuples: (create_time, token_id) to handle non-unique timestamps
+        self.ordered_tokens: List[Tuple[float, str]] = []
+
+    def create_token(
+        self,
+        token: str,
+        create_time: float,
+        ttl: Optional[float] = None,
+    ) -> TokenRecord:
+        """Creates and stores a new token record.
+
+        Time Complexity: O(N) due to insertion into sorted list (or O(log N) + O(1) if amortized).
+        """
+        ttl_to_use = ttl if ttl is not None else self.default_ttl
+        record = TokenRecord(token=token, create_time=create_time, ttl=ttl_to_use)
+
+        self.tokens_by_id[token] = record
+
+        # Maintain sorted order by (create_time, token) to handle identical timestamps deterministically
+        item = (create_time, token)
+        bisect.insort(self.ordered_tokens, item)
+
+        return record
+
+    def get_token(self, token: str) -> Optional[TokenRecord]:
+        """Retrieves a single token record by its token string.
+
+        Returns None if not found or if the token was revoked.
+        """
+        if token in self.revoked_tokens:
+            return None
+        return self.tokens_by_id.get(token)
+
+    def get_current_token_list(
+        self,
+        current_time: float,
+        include_expired: bool = False,
+    ) -> List[TokenRecord]:
+        """Retrieves the list of tokens ordered by create_time.
+
+        Parameters:
+        - current_time: Timestamp used to calculate active/unexpired state.
+        - include_expired: If True, returns all historical non-revoked tokens.
+        """
+        result: List[TokenRecord] = []
+
+        for _, token_id in self.ordered_tokens:
+            if token_id in self.revoked_tokens:
+                continue
+
+            record = self.tokens_by_id[token_id]
+            if include_expired or record.is_active(current_time):
+                result.append(record)
+
+        return result
+
+    def revoke_token(self, token: str) -> bool:
+        """Revokes (deletes) a token from active use.
+
+        Returns True if successful, False if token did not exist.
+        """
+        if token in self.tokens_by_id:
+            self.revoked_tokens.add(token)
+            return True
+        return False
+
+
+# Example Usage & Verification
+if __name__ == "__main__":
+    manager = TokenManager(default_ttl=3600.0)  # 1 hour default TTL
+
+    # 1. Create tokens (including duplicate create_time)
+    manager.create_token("token_a", create_time=1000.0, ttl=300.0)
+    manager.create_token("token_b", create_time=1000.0, ttl=100.0)  # Same timestamp
+    manager.create_token("token_c", create_time=1200.0, ttl=600.0)
+
+    # 2. Retrieve single token O(1)
+    record_a = manager.get_token("token_a")
+    print(f"Retrieved token_a: {record_a}")
+
+    # 3. Retrieve active token list at current_time = 1150.0
+    # token_b created at 1000 with TTL 100 expired at 1100 -> Should be excluded
+    active_tokens = manager.get_current_token_list(current_time=1150.0)
+    print("\nActive tokens at t=1150:")
+    for t in active_tokens:
+        print(f"  - {t.token} (created at {t.create_time})")
+
+    # 4. Revoke a token and check list again
+    manager.revoke_token("token_a")
+    active_after_revoke = manager.get_current_token_list(current_time=1150.0)
+    print("\nActive tokens after revoking token_a:")
+    for t in active_after_revoke:
+        print(f"  - {t.token} (created at {t.create_time})")
+
+'''
+{
+  "key_design_tradeoffs_and_clarifications": [
+    {
+      "scenario_or_aspect": "Duplicate Timestamps",
+      "recommendation": "Treat (create_time, token_id) as a composite key.",
+      "solution_approach": "bisect.insort on tuples maintains deterministic order."
+    },
+    {
+      "scenario_or_aspect": "Lookup Performance",
+      "recommendation": "Hash table lookup by token ID.",
+      "solution_approach": "self.tokens_by_id provides O(1) retrieval."
+    },
+    {
+      "scenario_or_aspect": "Expiration (TTL)",
+      "recommendation": "Filter dynamically at query time based on current_time.",
+      "solution_approach": "TokenRecord.is_active(current_time) condition."
+    },
+    {
+      "scenario_or_aspect": "Deletions / Revocations",
+      "recommendation": "Soft-deletion using a revoked lookup set.",
+      "solution_approach": "self.revoked_tokens keeps historical list clean without expensive array re-indexing."
+    }
+  ]
+}
+'''
+
+
 
 """
 ===============================================================================
@@ -1032,9 +1597,10 @@ class TokenManager:
             for record in self.tokens.values()
             if record.expiry_time <= current_time
         ]
+
         for tid in expired_ids:
             record = self.tokens.pop(tid)
-            self.active_tokens.discard(record)
+            self.active_tokens.discard(record) # method of sorted set to remove
 
     def generate(self, token_id: str, create_time: int) -> bool:
         """Registers a new token. Returns False if token_id already exists."""
@@ -1043,6 +1609,7 @@ class TokenManager:
 
         record = TokenRecord(token_id, create_time, self.default_ttl)
         self.tokens[token_id] = record
+
         self.active_tokens.add(record)
         return True
 
@@ -1226,7 +1793,8 @@ class Logger:
 
 #     2. Memory-Optimized Approach (Queue + Set)
 # In system design and higher-level coding interviews (like Confluent), follow-up questions often ask how to prevent memory leaks 
-# when messages arrive infinitely. Since entries older than 10 seconds become irrelevant, you can clean them up using a Queue (FIFO) paired with a Set.
+# when messages arrive infinitely. Since entries older than 10 seconds become irrelevant, 
+# you can clean them up using a Queue (FIFO) paired with a Set.
 
 from collections import deque
 
@@ -1256,9 +1824,11 @@ class Logger:
 # Key Follow-Up Interview Questions
 # If asked this in an interview, be prepared for these common extensions:
 
-# Concurrent / Thread-Safe Logger: How would you handle multiple worker threads submitting log messages at once? (Use a mutex/lock around the map, or use thread-safe ConcurrentHashMap structures).
+# Concurrent / Thread-Safe Logger: How would you handle multiple worker threads submitting log messages at once? 
+# (Use a mutex/lock around the map, or use thread-safe ConcurrentHashMap structures).
 
-# Distributed Rate Limiting: What if logs come from multiple servers where timestamps might arrive slightly out of order? (Use Redis with sliding window logs or token buckets).
+# Distributed Rate Limiting: What if logs come from multiple servers where timestamps might arrive slightly out of order? 
+# (Use Redis with sliding window logs or token buckets).
 
 import threading
 from collections import deque
@@ -1297,55 +1867,36 @@ For
 nums = [-3, 2, -3, 4, 2]
 , the running totals starting from
 x = 5
-are:
-
-5 → 2 → 4 → 1 → 5 → 7
+are: 5 → 2 → 4 → 1 → 5 → 7
 
 They are all positive. Starting with
 x = 4
-would eventually produce
-0
-, which is not positive, so
-5
-is the minimum.
+would eventually produce 0, which is not positive, so
+5 is the minimum.
 
 Key observation
-Let
-prefix
-be the sum of the array values seen so far, and track the smallest prefix sum, including the initial empty prefix
-0
-. Every running total is
-x + prefix
-, so the condition is:
+Let prefix be the sum of the array values seen so far, and track the smallest prefix sum, including the initial empty prefix 0
+. Every running total is  x + prefix , so the condition is:  x + minPrefix > 0
 
-x + minPrefix > 0
-
-Therefore:
-
-x = max(1, 1 - minPrefix)
+Therefore:  x = max(1, 1 - minPrefix)
 
 For the example, the minimum prefix sum is
--4
-, so
-x = max(1, 1 - (-4)) = 5
+-4, so x = max(1, 1 - (-4)) = 5
 .
 
-Scan the array once, updating the cumulative sum and its minimum. This takes O(n) time and O(1) extra space. The example explanation on your page appears inconsistent: the running totals for
-x = 5
-are
-2, 4, 1, 5, 7
-, not
-5, 2, -1, 3, 5
-. The stated answer
-5
-is still correct.
-
+Scan the array once, updating the cumulative sum and its minimum. 
+This takes O(n) time and O(1) extra space. The example explanation on your page appears inconsistent: 
+the running totals for x = 5 are 2, 4, 1, 5, 7 , not 5, 2, -1, 3, 5. The stated answer 5 is still correct.
 
 {
   "title": "Minimum Value to Get Positive Step by Step Sum",
-  "description": "Find the smallest positive starting integer `x` (where x ≥ 1) such that the cumulative running total stays strictly positive (greater than 0) after adding each element of the array sequentially from left to right.",
+  "description": "Find the smallest positive starting integer `x` (where x ≥ 1) 
+  such that the cumulative running total stays strictly positive (greater than 0) after adding each element 
+  of the array sequentially from left to right.",
+
   "formula": "x = max(1, 1 - minPrefix)",
-  "key_observation": "For any step i, the running sum equals `x + prefix[i]`. To ensure `x + prefix[i] >= 1` for all i, `x` must be at least `1 - minPrefix`, bounded below by 1 because `x` must be a positive starting value.",
+  "key_observation": "For any step i, the running sum equals `x + prefix[i]`. To ensure `x + prefix[i] >= 1` for all i, 
+  `x` must be at least `1 - minPrefix`, bounded below by 1 because `x` must be a positive starting value.",
   "algorithm": {
     "steps": [
       "Initialize `current_prefix = 0` and `min_prefix = 0`.",
@@ -1391,10 +1942,24 @@ is still correct.
       }
     ]
   },
-  "notes_and_corrections": "If x = 4 were chosen, step 3 (-3) would produce a running total of 0 (which is not strictly positive). Thus, x = 5 is the minimal valid positive starting value."
+  "notes_and_corrections": "If x = 4 were chosen, step 3 (-3) would produce a running total of 0 (which is not strictly positive). 
+  Thus, x = 5 is the minimal valid positive starting value."
 }
 """
+from typing import List
 
+def minStartValue(nums: List[int]) -> int:
+    prefix = 0
+    min_prefix = 0              # include the empty prefix
+    for num in nums:
+        prefix += num
+        min_prefix = min(min_prefix, prefix)
+    return max(1, 1 - min_prefix)
+
+
+print(minStartValue([-3, 2, -3, 4, 2]))   # 5
+print(minStartValue([1, 2]))              # 1
+print(minStartValue([1, -2, -3]))         # 5
 
 
 ###################################
@@ -1402,52 +1967,244 @@ is still correct.
 """
 Get best price
 Find the minimum total price to get all requested menu items using single items and discounted value meals.
-Input: menu items with prices, value meal bundles with prices, and a desired item list; Output: best total price; Constraint: up to 3 unique items.
+Input: menu items with prices, value meal bundles with prices, and a desired item list; 
+Output: best total price; Constraint: up to 3 unique items.
+
 Real-world context: restaurant ordering app optimizing cost for a user’s meal.
 From Confluent interviews; a coding interview problem and common interview question on bundle pricing.
 """
 
+from functools import lru_cache
 
+def get_best_price(menu: dict[str, float], meals: list[tuple[dict[str, int], float]], order: dict[str, int]) -> float:
+    """
+    Finds the minimum price to fulfill the order using menu items and meal bundles.
+    
+    :param menu: Dict mapping item names to single item prices.
+                 e.g., {"burger": 5.0, "fries": 2.0, "soda": 1.5}
+    :param meals: List of tuples (bundle_items_dict, bundle_price).
+                  e.g., [({"burger": 1, "fries": 1}, 6.0)]
+    :param order: Dict mapping requested item names to requested quantities.
+                  e.g., {"burger": 2, "fries": 1}
+    :return: Minimum total price.
+    """
+    # Filter out order items with 0 quantity
+    requested_items = [item for item, qty in order.items() if qty > 0]
+    if not requested_items:
+        return 0.0
+    
+    item_to_idx = {item: i for i, item in enumerate(requested_items)}
+    num_items = len(requested_items)
+    
+    target_tuple = tuple(order[item] for item in requested_items)
+    
+    # Standardize options into (quantity_vector_tuple, price)
+    options = []
+    
+    # 1. Add single item options
+    for item, idx in item_to_idx.items():
+        if item in menu:
+            vec = [0] * num_items
+            vec[idx] = 1
+            options.append((tuple(vec), menu[item]))
+            
+    # 2. Add value meal bundle options
+    for meal_items, price in meals:
+        vec = [0] * num_items
+        is_relevant = False
+
+        for item, qty in meal_items.items():
+            if item in item_to_idx:
+                vec[item_to_idx[item]] = qty
+                if qty > 0:
+                    is_relevant = True
+
+        if is_relevant:
+            options.append((tuple(vec), price))
+            
+    @lru_cache(maxsize=None)
+    def min_cost(current_target: tuple[int, ...]) -> float:
+        # If all requested item counts are met or exceeded
+        if all(qty <= 0 for qty in current_target):
+            return 0.0
+        
+        best = float('inf')
+        
+        for bundle_vec, price in options:
+            # Create next state by subtracting bundle quantities
+            next_target = tuple(max(0, current_target[i] - bundle_vec[i]) for i in range(num_items))
+            
+            # Avoid infinite loops if bundle contributes nothing to current target
+            if next_target == current_target:
+                continue
+                
+            cost = price + min_cost(next_target)
+            best = min(best, cost)
+            
+        return best
+
+    return min_cost(target_tuple)
+
+
+# --- Example Usage ---
+if __name__ == "__main__":
+    single_menu = {
+        "burger": 5.0,
+        "fries": 2.5,
+        "soda": 1.5
+    }
+
+    value_meals = [
+        ({"burger": 1, "fries": 1}, 6.0),          # Combo A: Burger + Fries = $6.00
+        ({"burger": 1, "fries": 1, "soda": 1}, 7.5) # Combo B: Full meal = $7.50
+    ]
+
+    requested_order = {
+        "burger": 2,
+        "fries": 1,
+        "soda": 1
+    }
+
+    # Best strategy: 
+    # 1x Combo B (Burger, Fries, Soda) = $7.50
+    # 1x Single Burger = $5.00
+    # Total = $12.50
+    result = get_best_price(single_menu, value_meals, requested_order)
+    print(f"Minimum Price: ${result:.2f}")
+
+
+    # Answer without lru cache
+    def get_best_price(menu: dict[str, float], meals: list[tuple[dict[str, int], float]], order: dict[str, int]) -> float:
+    """
+    Finds the minimum price to fulfill the order using menu items and meal bundles.
+    Memoization is handled explicitly using a Python dictionary.
+    
+    :param menu: Dict mapping item names to single item prices.
+                 e.g., {"burger": 5.0, "fries": 2.5, "soda": 1.5}
+    :param meals: List of tuples (bundle_items_dict, bundle_price).
+                  e.g., [({"burger": 1, "fries": 1}, 6.0)]
+    :param order: Dict mapping requested item names to requested quantities.
+                  e.g., {"burger": 2, "fries": 1, "soda": 1}
+    :return: Minimum total price.
+    """
+    # Filter out requested items with 0 quantity
+    requested_items = [item for item, qty in order.items() if qty > 0]
+    if not requested_items:
+        return 0.0
+    
+    item_to_idx = {item: i for i, item in enumerate(requested_items)}
+    num_items = len(requested_items)
+    
+    target_tuple = tuple(order[item] for item in requested_items)
+    
+    # Standardize options into (quantity_vector_tuple, price)
+    options = []
+    
+    # 1. Add single item options
+    for item, idx in item_to_idx.items():
+        if item in menu:
+            vec = [0] * num_items
+            vec[idx] = 1
+            options.append((tuple(vec), menu[item]))
+            
+    # 2. Add value meal bundle options
+    for meal_items, price in meals:
+        vec = [0] * num_items
+        is_relevant = False
+        for item, qty in meal_items.items():
+            if item in item_to_idx:
+                vec[item_to_idx[item]] = qty
+                if qty > 0:
+                    is_relevant = True
+        if is_relevant:
+            options.append((tuple(vec), price))
+            
+    # Dictionary to store cached state results: target_tuple -> min_cost
+    memo = {}
+
+    def min_cost(current_target: tuple[int, ...]) -> float:
+        # Base case: All item demands are satisfied
+        if all(qty <= 0 for qty in current_target):
+            return 0.0
+        
+        # Check memo dictionary before computing
+        if current_target in memo:
+            return memo[current_target]
+        
+        best = float('inf')
+        
+        for bundle_vec, price in options:
+            # Create next state by subtracting bundle quantities
+            next_target = tuple(max(0, current_target[i] - bundle_vec[i]) for i in range(num_items))
+            
+            # Avoid infinite recursion if bundle adds no useful items
+            if next_target == current_target:
+                continue
+                
+            cost = price + min_cost(next_target)
+            best = min(best, cost)
+            
+        # Cache result in memo dictionary
+        memo[current_target] = best
+        return best
+
+    return min_cost(target_tuple)
+
+
+# --- Example Usage ---
+if __name__ == "__main__":
+    single_menu = {
+        "burger": 5.0,
+        "fries": 2.5,
+        "soda": 1.5
+    }
+
+    value_meals = [
+        ({"burger": 1, "fries": 1}, 6.0),          # Combo A: Burger + Fries = $6.00
+        ({"burger": 1, "fries": 1, "soda": 1}, 7.5) # Combo B: Full meal = $7.50
+    ]
+
+    requested_order = {
+        "burger": 2,
+        "fries": 1,
+        "soda": 1
+    }
+
+    result = get_best_price(single_menu, value_meals, requested_order)
+    print(f"Minimum Price: ${result:.2f}")  # Output: Minimum Price: $12.50
 ###################################
 
 """
 Function Overloading Matching with Variable Arguments Support
 
-The Function Overloading Matching with Variable Arguments Support prompt asks you to register function signatures, then return every function whose signature matches a supplied list of argument types.
+The Function Overloading Matching with Variable Arguments Support prompt asks you to register function signatures, 
+then return every function whose signature matches a supplied list of argument types.
 
-A function is represented by its name, a vector of parameter types, and an
-isCard
-flag. In Part 1,
-isCard
-is false: a function matches only when its parameter list has the same length as the input and every type matches in the same position. So a function with
-{"Integer", "Boolean"}
-matches that exact argument list, but not
+A function is represented by its name, a vector of parameter types, and an isCard flag. 
+In Part 1, isCard is false: a function matches only when its parameter list has the same length as the input 
+and every type matches in the same position. So a function with {"Integer", "Boolean"} matches that exact argument list, but not
 {"Integer"}
 .
 
-In Part 2,
-isCard == true
-means the final parameter is variadic: it can match zero or more additional arguments of that type. For example,
-{"Integer"}
-with
-isCard == true
-can match
-{"Integer"}
-and
-{"Integer", "Integer", "Integer"}
-. The fixed parameters must still match exactly; each extra argument must match the variadic parameter’s type. Return all matches, since distinct functions may have identical signatures.
+In Part 2, isCard == true means the final parameter is variadic: it can match zero or more additional arguments of that type. 
+For example, {"Integer"} with isCard == true can match {"Integer"} and {"Integer", "Integer", "Integer"}. 
+The fixed parameters must still match exactly; each extra argument must match the variadic parameter’s type. 
+Return all matches, since distinct functions may have identical signatures.
 
-A straightforward implementation checks each registered function against the input: verify the fixed argument positions, then validate any extra arguments if it is variadic. With
-n
-functions and at most
-m
-arguments, this costs O(n · m) per lookup and uses O(n · m) storage for the registrations.
+A straightforward implementation checks each registered function against the input: verify the fixed argument positions, 
+then validate any extra arguments if it is variadic. With n functions and at most m arguments, 
+this costs O(n · m) per lookup and uses O(n · m) storage for the registrations.
 
-One detail to confirm from the full prompt: whether a variadic function with an empty parameter list is valid, since there would be no final parameter type to repeat. I couldn’t find this exact question in Confluent’s searchable materials; the available Confluent interview experiences may offer related context.
+One detail to confirm from the full prompt: whether a variadic function with an empty parameter list is valid, 
+since there would be no final parameter type to repeat. 
+I couldn’t find this exact question in Confluent’s searchable materials; 
+the available Confluent interview experiences may offer related context.
 
 {
   "title": "Function Overloading Matching with Variable Arguments Support",
-  "description": "Register function signatures and evaluate queries to return all registered functions whose signature matches a supplied sequence of argument types.",
+  "description": "Register function signatures and evaluate queries to return all registered functions 
+  whose signature matches a supplied sequence of argument types.",
+
   "data_structures": {
     "Function": {
       "name": "String — Name of the function.",
@@ -1498,11 +2255,32 @@ One detail to confirm from the full prompt: whether a variadic function with an 
     "Verify whether a function with is_card == true and an empty parameter list (len(params) == 0) is valid, as there is no final parameter type specified for variadic matching."
   ]
 }
+
+################# Concise version
+
+Build a registry of function signatures, then answer queries: given a list of argument types, 
+return all registered functions that could be called with those arguments.
+
+Each function has a name, parameter_types (list of strings), and is_card (variadic flag).
+
+Matching rules
+
+Exact (is_card = False): len(args) == len(params) and args[i] == params[i] for every i.
+Variadic (is_card = True): the last parameter type T can repeat zero or more times.
+Fixed part = params[:-1], must match the first len(params)-1 args exactly.
+Every remaining arg must equal T.
+Needs len(args) >= len(params) - 1.
+Return every match (different functions may share a signature, so don't dedupe or stop at the first).
+
+Edge case to clarify: variadic with empty params has no type to repeat. 
+The safest reading is "invalid", or it matches only an empty arg list. I treat it as matching only [].
 """
 
 # Semantics
 # Non-variadic: the argument count must equal the parameter count, and the types must match position by position.
-# Variadic: the last parameter is the repeatable type and the ones before it are fixed. So ["Integer"] with is_card=True means 0 fixed parameters plus Integer*. The call needs at least len(params) - 1 arguments, the fixed ones must match exactly, and every remaining argument must equal the last parameter type.
+# Variadic: the last parameter is the repeatable type and the ones before it are fixed. 
+# So ["Integer"] with is_card=True means 0 fixed parameters plus Integer*. The call needs at least len(params) - 1 arguments,
+#  the fixed ones must match exactly, and every remaining argument must equal the last parameter type.
 # Variadic with empty params: the spec leaves this open. I reject it at registration, because there is no type to repeat.
 # Straightforward version: O(n·m) per lookup
 
@@ -1544,8 +2322,11 @@ class FunctionRegistry:
 # Hash the signatures, so a query never scans all registered functions.
 
 # Exact functions go in exact[tuple(params)].
-# Variadic functions go in var_typed[(fixed_prefix, var_type)] and in var_any[fixed_prefix], which handles the zero-extra-arguments case.
-# For a query with m args, the trailing run of identical types starting at position s is the only place a variadic tail can begin. So only the split points k in [s, m] need to be checked.
+# Variadic functions go in var_typed[(fixed_prefix, var_type)] and in var_any[fixed_prefix], 
+# which handles the zero-extra-arguments case.
+
+# For a query with m args, the trailing run of identical types starting at position s is the only place a variadic tail can begin. 
+# So only the split points k in [s, m] need to be checked.
 
 from collections import defaultdict
 
@@ -1561,6 +2342,7 @@ class FastFunctionRegistry:
         if is_card and not params:
             raise ValueError("variadic function needs at least one parameter type")
         f = Function(name, tuple(params), is_card)
+
         entry = (self._count, f)
         self._count += 1
 
@@ -1641,9 +2423,214 @@ For arbitrary values and unrestricted updates, maintaining the exact maximum in 
 
 So ask whether values are bounded (for example, integers in a small known range), whether updates are restricted, and whether “O(1)” means average/expected time. Those constraints determine a valid design. The exact question wasn’t found in Confluent’s searchable materials; 
 
-
-
 """
+# Python Solution (Balanced BST approach using SortedDict)This provides deterministic $O(1)$ GetAverage and GetMax, with $O(\log N)$ Put.
+
+from sortedcontainers import SortedDict
+
+class MaxAverageKVStore:
+    def __init__(self):
+        self.key_to_val = {}
+        self.val_counts = SortedDict()  # value -> count of keys having this value
+        self.total_sum = 0.0
+        self.count = 0
+
+    def put(self, key: str, value: float) -> None:
+        if key in self.key_to_val:
+            old_val = self.key_to_val[key]
+            # Adjust running sum
+            self.total_sum += (value - old_val)
+            
+            # Decrement old value frequency
+            self.val_counts[old_val] -= 1
+            if self.val_counts[old_val] == 0:
+                del self.val_counts[old_val]
+        else:
+            # New key insertion
+            self.total_sum += value
+            self.count += 1
+
+        # Store new value
+        self.key_to_val[key] = value
+        self.val_counts[value] = self.val_counts.get(value, 0) + 1
+
+    def get(self, key: str) -> float:
+        if key not in self.key_to_val:
+            raise KeyError("Key not found")
+        return self.key_to_val[key]
+
+    def get_average(self) -> float:
+        if self.count == 0:
+            raise ValueError("Store is empty")
+        return self.total_sum / self.count
+
+    def get_max(self) -> float:
+        if not self.val_counts:
+            raise ValueError("Store is empty")
+        # peekitem(-1) gets the highest key in SortedDict in O(1) time
+        max_val, _ = self.val_counts.peekitem(-1)
+        return max_val
+
+
+# Python Solution (Lazy Deletion Heap — Pure Standard Library)
+# If external libraries like sortedcontainers aren't allowed in an interview, use a Max-Heap with Lazy Cleanup:
+
+import heapq
+
+class MaxAverageKVStoreHeap:
+    def __init__(self):
+        self.key_to_val = {}
+        self.max_heap = []  # Stores (-value, key)
+        self.total_sum = 0.0
+        self.count = 0
+
+    def put(self, key: str, value: float) -> None:
+        if key in self.key_to_val:
+            old_val = self.key_to_val[key]
+            self.total_sum += (value - old_val)
+        else:
+            self.total_sum += value
+            self.count += 1
+
+        self.key_to_val[key] = value
+        # Push to heap (using negative value for max-heap behavior)
+        heapq.heappush(self.max_heap, (-value, key))
+
+    def get(self, key: str) -> float:
+        return self.key_to_val[key]
+
+    def get_average(self) -> float:
+        if self.count == 0:
+            raise ValueError("Store is empty")
+        return self.total_sum / self.count
+
+    def get_max(self) -> float:
+        # Lazy eviction: discard stale entries at top of heap
+        while self.max_heap:
+            neg_val, key = self.max_heap[0]
+            curr_val = -neg_val
+            # Check if this heap entry matches current state in hash map
+            if key in self.key_to_val and self.key_to_val[key] == curr_val:
+                return curr_val
+            heapq.heappop(self.max_heap)
+            
+        raise ValueError("Store is empty")
+
+'''
+Here is the $O(1)$ solution using a Hash Map, a Doubly Linked List (DLL) ordered by value, and a Node Lookup Map.
+By keeping nodes sorted by value in the DLL, GetMax() is strictly $O(1)$ (reading the tail node). 
+Updating a key involves unlinking its node and inserting it into its new sorted position.
+Data Structure Architecturekey_map: Maps key $\rightarrow$ DLLNode for $O(1)$ node lookups.head / tail: 
+Sentinel nodes maintaining the list in ascending value order (head = minimum value, tail = maximum value).total_sum & count: 
+Maintain running aggregates for $O(1)$ GetAverage().
+'''
+
+class Node:
+    def __init__(self, key: str = "", val: float = 0.0):
+        self.key = key
+        self.val = val
+        self.prev = None
+        self.next = None
+
+
+class MaxAverageKVStoreDLL:
+    def __init__(self):
+        self.key_map = {}  # key -> Node
+        self.total_sum = 0.0
+        self.count = 0
+
+        # Dummy sentinel nodes for sorted DLL (head: min, tail: max)
+        self.head = Node()
+        self.tail = Node()
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def _unlink(self, node: Node) -> None:
+        """Removes a node from its current position in O(1) time."""
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def _insert_sorted(self, node: Node) -> None:
+        """Inserts node into its correct position to maintain ascending value order."""
+        # Search backward from tail since updates/new entries tend to be near the top
+        curr = self.tail.prev
+        while curr != self.head and curr.val > node.val:
+            curr = curr.prev
+
+        # Insert 'node' right after 'curr'
+        node.next = curr.next
+        node.prev = curr
+        curr.next.prev = node
+        curr.next = node
+
+    def put(self, key: str, value: float) -> None:
+        if key in self.key_map:
+            # Update existing key
+            node = self.key_map[key]
+            self.total_sum += (value - node.val)
+            node.val = value
+            
+            # Reposition node in DLL
+            self._unlink(node)
+            self._insert_sorted(node)
+        else:
+            # Insert new key
+            node = Node(key, value)
+            self.key_map[key] = node
+            self.total_sum += value
+            self.count += 1
+            
+            self._insert_sorted(node)
+
+    def get(self, key: str) -> float:
+        if key not in self.key_map:
+            raise KeyError(f"Key '{key}' not found.")
+        return self.key_map[key].val
+
+    def get_average(self) -> float:
+        if self.count == 0:
+            raise ValueError("Store is empty.")
+        return self.total_sum / self.count
+
+    def get_max(self) -> float:
+        if self.count == 0:
+            raise ValueError("Store is empty.")
+        # The maximum node is always immediately before the tail sentinel
+        return self.tail.prev.val
+
+
+# --- Example Usage ---
+if __name__ == "__main__":
+    kv = MaxAverageKVStoreDLL()
+    
+    kv.put("A", 5.0)
+    kv.put("B", 8.0)
+    print("Max:", kv.get_max())       # Output: 8.0
+    print("Avg:", kv.get_average())   # Output: 6.5
+
+    # Updating key "B" (holding 8.0) down to 2.0
+    kv.put("B", 2.0)
+    print("New Max:", kv.get_max())   # Output: 5.0 (A becomes the new max)
+    print("New Avg:", kv.get_average()) # Output: 3.5    
+
+'''
+Get(key): $O(1)$ direct hash map lookup.GetAverage(): $O(1)$ scalar arithmetic (total_sum / count).GetMax(): $O(1)$ 
+accessing tail.prev.val.Put(key, val):Unlinking node: $O(1)$.
+Linear search for insertion position: $O(N)$ worst-case (if values are arbitrary), 
+$O(1)$ best-case (if inserted values are sequentially near existing values).
+'''
+
+
+'''
+To achieve strict $O(1)$ time complexity across ALL operations (Put, Get, GetAverage, and GetMax), 
+we combine a Hash Map with a Bucket-based Doubly Linked List (similar to the All O(1) Data Structure / LFU Cache).
+Key Insight & AssumptionsFor arbitrary floating-point numbers or unbound values, maintaining a sorted order in $O(1)$ worst-case 
+is theoretically impossible (it would violate the $O(N \log N)$ sorting lower bound).
+However, in real-world systems (and standard coding interviews targeting $O(1)$), 
+values are either integers bounded within a range or discrete quantities/frequencies.
+By grouping keys that share the exact same value into Value Buckets, we can organize the buckets in a Doubly Linked List and maintain direct pointer mapping for $O(1)$ bucket jumps.Data Structure Designkey_map (key -> (val, node_ptr)):Maps each key to its current value and its location inside a ValueBucket.bucket_map (val -> ValueBucket):Maps each distinct value directly to its ValueBucket node in $O(1)$ time.ValueBucket (Doubly Linked List Node):Holds value: The numerical value shared by all keys in this bucket.Holds keys: A hash set of keys that currently have this value.Holds prev / next: Pointers linking to smaller/larger value buckets.head & tail Sentinels:head: Lowest value bucket.tail: Highest value bucket. tail.prev.value gives GetMax() in $O(1)$ time.
+'''
+
 
 ###################################
 
@@ -1652,7 +2639,12 @@ https://www.glassdoor.ca/Interview/Confluent-Software-Engineer-Interview-Questio
 
 Interview
 
-1. Regex pattern matching 2. Java concurrency using threads type problem 3. Matrix path finding problem with weigths in each cells 4. Behaviour style round with hiring manager Be well prepared with leetcode medium and hard problems. Interviewers were very friendly overall. Looks like a good company.
+1. Regex pattern matching 
+2. Java concurrency using threads type problem 
+3.Matrix path finding problem with weigths in each cells 
+4. Behaviour style round with hiring manager Be well prepared with leetcode medium and hard problems. 
+Interviewers were very friendly overall. Looks like a good company.
+
 Interview questions [1]
 
 Question 1
@@ -1765,224 +2757,6 @@ print(idx.search("Cloud computing is"))  # [1, 3]
 
 """
 """
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-"""
-"""
-
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-"""
-"""
-
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-"""
-"""
-
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-"""
-"""
-
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-###################################
-
-"""
-"""
-
-
-###################################
-
-"""
-"""
-
-
-###################################
-"""
-"""
-
-
 
 ###################################
 
