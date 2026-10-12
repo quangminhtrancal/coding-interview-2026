@@ -325,6 +325,30 @@ class TokenBucket:
 
 ### Pattern 14: Concurrent web crawler
 ```python
+
+import requests
+from html.parser import HTMLParser
+from urllib.parse import urljoin
+
+class LinkParser(HTMLParser):
+    def __init__(self, base):
+        super().__init__()
+        self.base, self.links = base, []
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            href = dict(attrs).get("href")
+            if href:
+                self.links.append(urljoin(self.base, href))
+
+def get_links(url):
+    try:
+        html = requests.get(url, timeout=5).text
+    except requests.RequestException:
+        return []                      # treat failures as "no links"
+    p = LinkParser(url)
+    p.feed(html)
+    return p.links
+    
 def crawl(start, get_links, max_workers=8):
     visited, lock = {start}, threading.Lock()
     with ThreadPoolExecutor(max_workers) as ex:
@@ -339,6 +363,7 @@ def crawl(start, get_links, max_workers=8):
                     next_frontier.append(ex.submit(get_links, link))
             frontier = next_frontier
     return visited
+
 ```
 
 ### Pattern 15: Barrier and phased work
