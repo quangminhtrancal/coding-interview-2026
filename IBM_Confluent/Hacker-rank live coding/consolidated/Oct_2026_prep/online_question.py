@@ -2756,6 +2756,13 @@ print(idx.search("Cloud computing is"))  # [1, 3]
 ###################################
 
 """
+https://leetcode.com/discuss/post/4188001/confluent-seniorstaff-software-engineer-5219u/
+
+Coding - Given a list of documents [Pair of id and content], return the list of documentIds for a given search phrase.
+Dictionary of documentId to dictionary of string and their index - Use this to then check for a given search phrase.
+
+ For the Document search question, follow-up was to support complex search queries with AND, OR, and brackets ( ) => 
+ I could do this too.
 """
 
 ###################################

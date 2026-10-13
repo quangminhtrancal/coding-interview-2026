@@ -20,3 +20,10 @@ talked about splitting monolith to microservices and how to go about it
 each question focuses on hld first then followed by how to actually do it in cloud
 
 
+https://leetcode.com/discuss/post/4188001/confluent-seniorstaff-software-engineer-5219u/
+Design round: TinyUrl (Constraints: optimize only for high volume of reads - a simple singleton service with a sharded database(range based sharding on short url would suffice. You can add more read replicas with additional caching at the edge if needed). Do not make it complex
+
+Design round 1(API design) - Spotify like system. Design APIs to retrieve X podcast channels at a time, X audio clips per podcast channel, Database design and high level component design [pagination, skip tokens, limit/offset, api versioning, back of the napkin calculation for number of users to number of podcast channels, podcast channel to number of audio clips per channel, corner cases[users subscribed to a lot of channels, channels with a lot of videos, etc.,]]
+
+
+

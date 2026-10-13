@@ -10,9 +10,10 @@ Everything in this file is Python 3 (standard library only). Each problem has: *
 2. [Key-value store with transactions](#1-key-value-store-with-transactions) (nested, conflict detection on commit, multi-threaded)
 3. [Resource pool: get/put, then priority](#2-resource-pool-getput-then-priority)
 4. [Classic concurrency questions](#3-classic-concurrency-questions) (bounded queue, print-in-order, FooBar, Zero-Even-Odd, H2O, FizzBuzz, dining philosophers, web crawler)
-5. [Systems-style concurrency questions](#4-systems-style-concurrency-questions) (rate limiter, thread-safe LRU, readers-writer lock, thread pool, delayed scheduler)
-6. [Rules of thumb](#5-rules-of-thumb-for-the-interview)
-7. [Sources](#6-sources)
+5. [More classic concurrency questions](#4-more-classic-concurrency-questions) (thread-safe singleton, CountDownLatch, pub/sub event bus, concurrent hash map, async logger, traffic light)
+6. [Systems-style concurrency questions](#5-systems-style-concurrency-questions) (rate limiter, thread-safe LRU + TTL, readers-writer lock, thread pool, delayed scheduler with cancellation)
+7. [Rules of thumb](#6-rules-of-thumb-for-the-interview)
+8. [Sources](#7-sources)
 
 ---
 
@@ -946,6 +947,58 @@ def crawl(startUrl, htmlParser, workers=8):
 
 Trade-off: a level waits for its slowest page. The fully asynchronous alternative (workers push new URLs onto a shared queue, `visited` guarded by a lock, termination via a pending-task counter) keeps all workers busy but is harder to get right.
 
+**Async alternative implementation.** Workers pull from a shared `queue.Queue` and push newly discovered URLs. Termination is via a `pending` counter: increment when a URL is enqueued, decrement when a worker finishes processing it. When `pending` reaches zero, a `done` event fires and workers exit. Workers poll with a short timeout so they notice `done` and don't block forever on an empty queue.
+
+```python
+# file: classics.py
+import queue as _queue
+
+
+def crawl_async(startUrl, htmlParser, workers=8):
+    """Async crawler: workers pull from a shared queue, push new URLs.
+    Termination via a pending-task counter."""
+    host = urlparse(startUrl).hostname
+    visited = {startUrl}
+    visited_lock = threading.Lock()
+    work_queue = _queue.Queue()
+    work_queue.put(startUrl)
+    pending = [1]            # tasks queued or in progress
+    pending_lock = threading.Lock()
+    done = threading.Event()
+
+    def task_done():
+        with pending_lock:
+            pending[0] -= 1
+            if pending[0] == 0:
+                done.set()
+
+    def worker():
+        while not done.is_set():
+            try:
+                url = work_queue.get(timeout=0.05)
+            except _queue.Empty:
+                continue
+            try:
+                for u in htmlParser.getUrls(url):
+                    if urlparse(u).hostname == host:
+                        with visited_lock:
+                            if u not in visited:
+                                visited.add(u)
+                                work_queue.put(u)
+                                with pending_lock:
+                                    pending[0] += 1
+            finally:
+                task_done()
+
+    threads = [threading.Thread(target=worker, daemon=True) for _ in range(workers)]
+    for t in threads: t.start()
+    done.wait(timeout=30)
+    for t in threads: t.join(timeout=5)
+    return list(visited)
+```
+
+When to use which: the BFS-level version is simpler (no lock on `visited`, no termination logic) but a slow page stalls the whole level. The async version keeps all workers busy but requires a lock on `visited` and careful termination. In production, prefer `asyncio` + `aiohttp` for I/O-bound crawling (no threads at all).
+
 ### 3.9 Tests for section 3
 
 ```python
@@ -1052,6 +1105,20 @@ def test_crawler():
     assert got == {"http://a.com/", "http://a.com/1", "http://a.com/2", "http://a.com/3"}, got
 
 
+def test_crawler_async():
+    class FakeParser:
+        def __init__(self, graph): self.graph = graph
+        def getUrls(self, url):
+            time.sleep(0.01)
+            return self.graph.get(url, [])
+    g = {"http://a.com/": ["http://a.com/1", "http://a.com/2", "http://b.com/x"],
+         "http://a.com/1": ["http://a.com/3", "http://a.com/"],
+         "http://a.com/2": ["http://a.com/3"],
+         "http://b.com/x": ["http://a.com/hidden"]}
+    got = set(crawl_async("http://a.com/", FakeParser(g)))
+    assert got == {"http://a.com/", "http://a.com/1", "http://a.com/2", "http://a.com/3"}, got
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
@@ -1061,11 +1128,547 @@ if __name__ == "__main__":
 
 ---
 
-## 4. Systems-style concurrency questions
+## 4. More classic concurrency questions
 
-These are the "design a thread-safe X" questions that show up in onsite loops. They are not tied to numbered LeetCode problems, but each is a well-known interview and system-design staple (see [Sources](#6-sources)).
+These are additional multi-threaded interview questions that are commonly asked but not tied to numbered LeetCode problems. Each is a well-known interview staple (see [Sources](#7-sources)). All code in this section goes in one file with a shared test block at the end.
 
-### 4.1 Rate limiter (token bucket)
+### 4.1 Thread-safe singleton (double-checked locking)
+
+> *Implement a thread-safe singleton. Two threads call `get_instance()` simultaneously; both must get the same object, and the constructor must run exactly once.*
+
+This is a classic Java/C++ interview question adapted to Python. The naive "check-then-create" is a **race condition**: two threads can both see `None` and both create an instance.
+
+**Trick:** double-checked locking (DCL) — check without a lock first (fast path), then recheck under the lock (slow path). The outer check avoids lock overhead once the singleton exists; the inner check prevents a second thread from creating a duplicate while the first is still inside the lock.
+
+**Python subtlety:** In C++/Java, the instance pointer must be `volatile` to prevent the compiler from reordering the check before the constructor finishes (instruction reordering / memory visibility). Python doesn't have this problem (the GIL and bytecode ordering make attribute assignment visible), but we still need the lock for the check-then-act gap.
+
+```python
+# file: more_classics.py
+import threading
+
+
+class Singleton:
+    """Thread-safe singleton via double-checked locking."""
+    _instance = None
+    _lock = threading.Lock()
+
+    def __init__(self, value=None):
+        self.value = value
+
+    @classmethod
+    def get_instance(cls, value=None):
+        if cls._instance is None:            # fast path: no lock (safe read)
+            with cls._lock:
+                if cls._instance is None:     # re-check: another thread may have created it
+                    cls._instance = cls(value)
+        return cls._instance
+```
+
+**Pythonic alternative:** a module-level variable is already a thread-safe singleton because `import` holds an import lock. Mention DCL to show you understand the pattern, then say "in Python I'd just use a module-level variable."
+
+```python
+# _singleton = None
+# def get_singleton(value=None):
+#     global _singleton
+#     if _singleton is None:
+#         _singleton = MyClass(value)
+#     return _singleton
+```
+
+**Follow-ups:**
+- *"Why not just `synchronized` on the whole method?"* — Works but serializes every call, even after the singleton exists. DCL avoids lock overhead on the fast path.
+- *"Is DCL broken in Java?"* — It was before Java 5 (memory model fix, `volatile` now works). In Python it's fine because of the GIL.
+- *"What about `__new__`?"* — You can override `__new__` to make a singleton, but it's harder to pass arguments and it's less explicit.
+
+### 4.2 CountDownLatch equivalent
+
+> *Implement a `CountDownLatch`: initialize with count N; threads call `await()` to block; `count_down()` decrements N; when N reaches zero, all waiters are released. One-shot — cannot be reset.*
+
+This is Java's `java.util.concurrent.CountDownLatch`. It's the "wait for N things to finish" pattern: main thread waits for N worker threads, each worker calls `count_down()` when done.
+
+**Trick:** one `Condition`, a counter, `wait_for(count == 0)`. `count_down` calls `notify_all` because every waiter has the same predicate (count == 0). Unlike a `Barrier`, it's one-shot and waiters don't block each other from counting down.
+
+```python
+# file: more_classics.py
+class CountDownLatch:
+    """One-shot countdown latch. count_down N times to release all awaiters."""
+
+    def __init__(self, count):
+        self._count = count
+        self._cv = threading.Condition()
+
+    def count_down(self, n=1):
+        with self._cv:
+            self._count = max(0, self._count - n)
+            if self._count == 0:
+                self._cv.notify_all()
+
+    def await_(self, timeout=None):
+        with self._cv:
+            return self._cv.wait_for(lambda: self._count == 0, timeout)
+
+    @property
+    def count(self):
+        with self._cv:
+            return self._count
+```
+
+**Follow-ups:**
+- *"Barrier vs CountDownLatch?"* — Barrier: all N threads wait and all proceed together, reusable. Latch: N separate threads count down, one (or many) wait, one-shot.
+- *"Resettable latch?"* — That's a `CyclicBarrier` in Java. Add a `reset()` that sets count back to N and notifies all.
+- *"Timeout on await?"* — Already there via `wait_for(timeout)`.
+- *"Where is this used in real systems?"* — Service startup (wait for DB + cache + queue to be ready), parallel test initialization, shutdown (wait for N workers to drain).
+
+### 4.3 Thread-safe pub/sub event bus
+
+> *Implement a thread-safe publish/subscribe event bus. Subscribers register callbacks for topics; publishers emit events. A slow subscriber must not block other subscribers or the publisher.*
+
+This is the **actor/mailbox pattern**: each subscriber gets its own work queue and worker thread. `publish()` just enqueues to every relevant queue — it never calls subscriber code inline. Slow subscribers accumulate messages in their queue; fast subscribers process immediately.
+
+**Trick:** don't call subscriber callbacks under the bus lock (that would serialize all subscribers and block publishers). Instead, each subscriber has a `queue.Queue` + a daemon thread that drains it. The bus only touches its own dict under the lock.
+
+```python
+# file: more_classics.py
+import queue
+from collections import defaultdict
+
+
+class EventBus:
+    """Thread-safe pub/sub. Each subscriber has its own queue + worker."""
+
+    def __init__(self):
+        self._subs = defaultdict(list)   # topic -> list of (queue, stop_event, thread)
+        self._lock = threading.Lock()
+
+    def subscribe(self, topic, callback):
+        q = queue.Queue()
+        stop = threading.Event()
+
+        def worker():
+            while not stop.is_set():
+                try:
+                    event = q.get(timeout=0.1)
+                except queue.Empty:
+                    continue
+                if event is None:           # shutdown sentinel
+                    break
+                try:
+                    callback(event)
+                except Exception:
+                    pass                    # don't kill the worker on a bad callback
+            q.task_done()
+
+        t = threading.Thread(target=worker, daemon=True)
+        t.start()
+        with self._lock:
+            self._subs[topic].append((q, stop, t))
+        return (q, stop, t)
+
+    def unsubscribe(self, topic, sub):
+        with self._lock:
+            if sub in self._subs[topic]:
+                self._subs[topic].remove(sub)
+        sub[1].set()     # signal stop
+        sub[0].put(None)  # wake the worker
+
+    def publish(self, topic, event):
+        with self._lock:
+            subs = list(self._subs.get(topic, []))
+            subs.extend(self._subs.get("*", []))   # wildcard subscribers
+        for q, _stop, _t in subs:
+            q.put(event)     # non-blocking on the publisher side
+
+    def shutdown(self):
+        with self._lock:
+            all_subs = list(self._subs.values())
+            self._subs.clear()
+        for subs in all_subs:
+            for q, stop, t in subs:
+                stop.set()
+                q.put(None)
+                t.join(timeout=2)
+```
+
+**Follow-ups:**
+- *"What if a subscriber is slow and the queue grows unbounded?"* — Use a bounded `Queue(maxsize=N)`. Then decide: block the publisher (back-pressure), drop oldest (`put_nowait` + catch `Full`), or drop newest. Each has trade-offs: blocking couples publisher to slowest subscriber; dropping loses events.
+- *"Wildcard / pattern matching?"* — `*` matches all topics (shown above). For hierarchical patterns (`sensor.*`), use a trie or iterate matching topics on each publish.
+- *"Last-value caching (only keep the latest event per topic)?"* — Store the last event per topic; new subscribers get it immediately on subscribe.
+- *"Why not call callbacks inline?"* — A slow or buggy callback would block the publisher and all other subscribers. The queue decouples them.
+- *"Event ordering guarantees?"* — Per-subscriber: FIFO within one topic (queue preserves order). Cross-topic: no ordering guarantee (different queues). Say which you provide.
+
+### 4.4 Concurrent hash map with striped locks
+
+> *Implement a thread-safe hash map that allows concurrent access to different keys. A single lock serializes everything; a lock per key uses too much memory. Use striped locking.*
+
+This is the pattern behind Java's `ConcurrentHashMap` (pre-Java 8; since Java 8 it uses CAS + synchronized on bin heads, but striped locking is the interview answer). The idea: N locks, `hash(key) % N` picks the lock. Operations on different stripes run in parallel; same-stripe operations serialize.
+
+**Trick:** an array of N locks and N buckets. Each operation acquires only the lock for its stripe. `items()` / `size()` that need a consistent snapshot acquire all locks in order (to avoid deadlock — always acquire locks in the same order).
+
+**Important:** resize (rehash) needs ALL locks. We skip resize here for clarity. In production, use a `stop-the-world` approach (acquire all locks, rehash, release) or grow in segments.
+
+```python
+# file: more_classics.py
+class StripedConcurrentHashMap:
+    """Thread-safe dict with striped locking for parallel access to different keys."""
+
+    def __init__(self, stripes=16):
+        self._n = stripes
+        self._locks = [threading.Lock() for _ in range(stripes)]
+        self._buckets = [dict() for _ in range(stripes)]
+
+    def _stripe(self, key):
+        return hash(key) % self._n
+
+    def get(self, key, default=None):
+        s = self._stripe(key)
+        with self._locks[s]:
+            return self._buckets[s].get(key, default)
+
+    def put(self, key, value):
+        s = self._stripe(key)
+        with self._locks[s]:
+            self._buckets[s][key] = value
+
+    def delete(self, key):
+        s = self._stripe(key)
+        with self._locks[s]:
+            return self._buckets[s].pop(key, None)
+
+    def contains(self, key):
+        s = self._stripe(key)
+        with self._locks[s]:
+            return key in self._buckets[s]
+
+    def items(self):
+        """Snapshot: acquire all locks in order to prevent partial reads."""
+        result = []
+        for i in range(self._n):
+            with self._locks[i]:
+                result.extend(self._buckets[i].items())
+        return result
+
+    def size(self):
+        return sum(len(b) for b in self._buckets)
+```
+
+**Follow-ups:**
+- *"Why not a lock per key?"* — Too many locks (O(n) memory); overhead of lock creation/destruction. Stripes bound the lock count to a constant.
+- *"How many stripes?"* — Usually 16 (like Java's default). More stripes = more parallelism but more memory. Should be >= number of CPU cores.
+- *"What about `putIfAbsent` / `compute`?"* — Same pattern: acquire the stripe lock, do the check-then-act atomically inside.
+- *"Resize?"* — Acquire all locks in order, create new buckets, rehash all entries, swap, release. This is a stop-the-world pause. Alternative: incremental resize (move a few entries on each operation).
+- *"Why acquire all locks for `items()`?"* — Without all locks, you might see a key in one bucket that was moved from another during iteration. Acquiring in order prevents deadlock.
+
+### 4.5 Async / thread-safe logger
+
+> *Design a thread-safe logging facility where `log()` never blocks on disk I/O. Multiple threads call `log()` concurrently; a background thread writes to the file.*
+
+This is the pattern behind Python's `logging.handlers.QueueHandler` / `QueueListener`. The key insight: `log()` should be O(1) — just format and enqueue. The background writer drains the queue and does the slow I/O. This decouples log latency from disk latency.
+
+**Trick:** a `queue.Queue` + a background writer thread. `log()` formats the line and puts it on the queue (non-blocking if the queue is full — drop rather than block the caller). The writer thread blocks on `queue.get()` and writes batches to the file.
+
+```python
+# file: more_classics.py
+class AsyncLogger:
+    """Non-blocking logger: log() enqueues, a background thread writes."""
+
+    def __init__(self, path, queue_size=1024):
+        self._q = queue.Queue(maxsize=queue_size)
+        self._file = open(path, "a", buffering=1)  # line-buffered
+        self._closed = False
+        self._thread = threading.Thread(target=self._writer, daemon=True)
+        self._thread.start()
+
+    def log(self, level, msg):
+        ts = time.strftime("%Y-%m-%d %H:%M:%S")
+        tid = threading.get_ident()
+        line = f"[{ts}] [{level}] [tid={tid}] {msg}\n"
+        try:
+            self._q.put_nowait(line)       # non-blocking: drop if full
+        except queue.Full:
+            self._file.write("[DROPPED] log queue full\n")
+            self._file.flush()
+
+    def _writer(self):
+        while True:
+            line = self._q.get()
+            if line is None:                # shutdown sentinel
+                break
+            self._file.write(line)
+        self._file.flush()
+        self._file.close()
+
+    def flush(self):
+        """Block until all queued messages are written."""
+        self._q.put(None)       # sentinel
+        self._thread.join()
+        if not self._closed:    # re-start for continued use
+            self._file = open(self._file.name, "a", buffering=1)
+            self._thread = threading.Thread(target=self._writer, daemon=True)
+            self._thread.start()
+
+    def close(self):
+        self._closed = True
+        self._q.put(None)
+        self._thread.join(timeout=5)
+```
+
+**Follow-ups:**
+- *"Bounded queue: drop or block?"* — Drop (shown above, writes `[DROPPED]` to file). Blocking would couple log latency to disk speed. In production, use a large queue + monitoring on queue depth.
+- *"Batch writes?"* — The writer can drain up to N items per `get()` call to reduce syscall overhead. Use `q.get()` then `q.get_nowait()` in a loop.
+- *"Crash safety / durability?"* — `flush()` + `fsync()` on the file. Trade-off: fsync is expensive. Options: fsync every N messages, every T seconds, or on `flush()` only.
+- *"Structured logging (JSON)?"* — Same queue pattern; just change the format. Include thread ID, timestamp, level, message, and arbitrary metadata.
+- *"Multiple output destinations?"* — Fan-out: the writer thread writes to multiple handlers (file, stderr, network). Or use multiple writer threads, one per destination.
+
+### 4.6 Traffic light intersection
+
+> *Model a traffic-light intersection with two roads (NS and EW). Each road has a light (RED, GREEN, YELLOW). Only one road may be GREEN at a time. Implement `car_arrives(road)` that blocks until the light is GREEN, and a controller that cycles the lights automatically.*
+
+This is a "wait for predicate" problem, the same pattern as FizzBuzz. The light state is one shared variable guarded by a `Condition`. `car_arrives` waits for its road to be green; the controller cycles GREEN → YELLOW → RED → (other road) GREEN.
+
+**Trick:** one `Condition` guards the state (`active` road, `is_yellow` flag). The controller thread cycles the lights with timed waits. Cars wait on the condition. The controller `notify_all`s on every state change so waiting cars can re-check.
+
+```python
+# file: more_classics.py
+class TrafficLight:
+    """Two-road traffic light. car_arrives blocks until the road is green."""
+
+    GREEN, YELLOW, RED = "GREEN", "YELLOW", "RED"
+
+    def __init__(self, green_dur=1.0, yellow_dur=0.3):
+        self._green_dur = green_dur
+        self._yellow_dur = yellow_dur
+        self._active = 0            # 0 = NS green, 1 = EW green
+        self._is_yellow = False
+        self._cv = threading.Condition()
+        self._running = False
+        self._controller = None
+
+    def start(self):
+        self._running = True
+        self._controller = threading.Thread(target=self._control_loop, daemon=True)
+        self._controller.start()
+
+    def stop(self):
+        with self._cv:
+            self._running = False
+            self._cv.notify_all()
+        if self._controller:
+            self._controller.join(timeout=5)
+
+    def _control_loop(self):
+        while self._running:
+            with self._cv:
+                self._is_yellow = False
+                self._cv.notify_all()        # wake waiting cars (green for active road)
+                self._cv.wait_for(
+                    lambda: not self._running or self._is_yellow,
+                    timeout=self._green_dur)
+                if not self._running:
+                    break
+                self._is_yellow = True
+                self._cv.notify_all()        # tell cars it's yellow now
+                self._cv.wait_for(
+                    lambda: not self._running,
+                    timeout=self._yellow_dur)
+                if not self._running:
+                    break
+                self._active = 1 - self._active   # switch to the other road
+
+    def car_arrives(self, road):
+        """road: 0 (NS) or 1 (EW). Blocks until the light is green for road."""
+        with self._cv:
+            self._cv.wait_for(
+                lambda: self._active == road and not self._is_yellow)
+
+    def get_state(self):
+        with self._cv:
+            if self._is_yellow:
+                return ("YELLOW", "NS" if self._active == 0 else "EW")
+            return ("GREEN", "NS" if self._active == 0 else "EW")
+```
+
+**Follow-ups:**
+- *"Multiple lanes per road (left turn, straight, right)?"* — Add a phase per lane. The controller cycles through all phases. Each lane gets its own green window.
+- *"Sensor-based (on-demand) lights?"* — Instead of a fixed-duration timer, the controller checks if any cars are waiting on the active road. If not, switch early. Use the `_cv` to track waiting car counts.
+- *"Emergency vehicle preemption?"* — A high-priority signal that forces the active road to yellow then red immediately. The controller checks a flag.
+- *"Four-way intersection with turn arrows?"* — More states (NS-green, NS-left-arrow, EW-green, EW-left-arrow). Model as a state machine; the controller cycles through the state list.
+- *"Fairness: one road is starved?"* — The controller cycles deterministically, so neither road is starved. With sensor-based control, add a max-green-time to prevent starvation.
+
+### 4.7 Tests for section 4
+
+```python
+# file: more_classics.py
+# ---- tests ----
+def run(*fns, timeout=15):
+    errors = []
+
+    def wrap(fn):
+        def inner():
+            try:
+                fn()
+            except BaseException as e:
+                errors.append(e)
+        return inner
+    ts = [threading.Thread(target=wrap(f), daemon=True) for f in fns]
+    for t in ts: t.start()
+    for t in ts: t.join(timeout); assert not t.is_alive(), "deadlock?"
+    if errors:
+        raise errors[0]
+
+
+def test_singleton():
+    instances = []
+    lock = threading.Lock()
+
+    def worker():
+        s = Singleton.get_instance("first")
+        with lock:
+            instances.append(s)
+
+    ts = [threading.Thread(target=worker) for _ in range(20)]
+    for t in ts: t.start()
+    for t in ts: t.join(5)
+    assert all(i is instances[0] for i in instances), "singleton violated"
+    assert instances[0].value == "first"
+    assert Singleton.get_instance("other") is instances[0]
+    print("test_singleton OK")
+
+
+def test_countdown_latch():
+    latch = CountDownLatch(3)
+    done_order = []
+    lock = threading.Lock()
+
+    def worker(i):
+        time.sleep(0.01 * i)
+        with lock:
+            done_order.append(i)
+        latch.count_down()
+
+    ts = [threading.Thread(target=worker, args=(i,)) for i in range(3)]
+    for t in ts: t.start()
+    assert latch.await_(timeout=5), "latch timed out"
+    for t in ts: t.join(5)
+    assert latch.count == 0
+    assert latch.await_() is True        # immediate return once count is 0
+    print("test_countdown_latch OK")
+
+
+def test_event_bus():
+    bus = EventBus()
+    received_a, received_b, received_wild = [], [], []
+    lock = threading.Lock()
+
+    def make_cb(lst):
+        def cb(event):
+            with lock:
+                lst.append(event)
+        return cb
+
+    bus.subscribe("topic1", make_cb(received_a))
+    bus.subscribe("topic1", make_cb(received_b))
+    bus.subscribe("*", make_cb(received_wild))
+
+    bus.publish("topic1", "hello")
+    bus.publish("topic1", "world")
+    bus.publish("topic2", "other")
+    time.sleep(0.3)
+
+    assert received_a == ["hello", "world"], received_a
+    assert received_b == ["hello", "world"], received_b
+    assert received_wild == ["hello", "world", "other"], received_wild
+
+    sub = bus.subscribe("topic1", lambda e: None)
+    bus.unsubscribe("topic1", sub)
+    bus.shutdown()
+    print("test_event_bus OK")
+
+
+def test_concurrent_hash_map():
+    m = StripedConcurrentHashMap(stripes=8)
+
+    def writer(base):
+        for i in range(100):
+            m.put(f"k{base + i}", base + i)
+
+    ts = [threading.Thread(target=writer, args=(b,)) for b in range(0, 500, 100)]
+    for t in ts: t.start()
+    for t in ts: t.join(10)
+    assert m.size() == 500, m.size()
+    for i in range(500):
+        assert m.get(f"k{i}") == i, f"k{i}"
+    m.delete("k0")
+    assert not m.contains("k0")
+    assert m.get("k0", "gone") == "gone"
+
+    def reader():
+        for i in range(200):
+            m.get(f"k{i % 500}")
+    ts2 = [threading.Thread(target=reader) for _ in range(8)]
+    ts3 = [threading.Thread(target=writer, args=(500,)) for _ in range(4)]
+    for t in ts2 + ts3: t.start()
+    for t in ts2 + ts3: t.join(10)
+    print("test_concurrent_hash_map OK")
+
+
+def test_async_logger():
+    import os, tempfile
+    path = tempfile.mktemp(suffix=".log")
+    logger = AsyncLogger(path)
+    for i in range(50):
+        logger.log("INFO", f"message {i}")
+    logger.flush()
+    logger.close()
+    with open(path) as f:
+        lines = f.readlines()
+    os.unlink(path)
+    assert len(lines) >= 45, f"only {len(lines)} lines logged"
+    assert "message 0" in lines[0]
+    print("test_async_logger OK")
+
+
+def test_traffic_light():
+    tl = TrafficLight(green_dur=0.1, yellow_dur=0.03)
+    tl.start()
+    assert tl.get_state() == ("GREEN", "NS"), tl.get_state()
+    passed = []
+    lock = threading.Lock()
+
+    def car_ns():
+        tl.car_arrives(0)
+        with lock: passed.append("NS")
+
+    def car_ew():
+        tl.car_arrives(1)
+        with lock: passed.append("EW")
+
+    t1 = threading.Thread(target=car_ns)
+    t1.start(); t1.join(2)
+    assert "NS" in passed
+
+    t2 = threading.Thread(target=car_ew)
+    t2.start(); t2.join(0.05)
+    assert t2.is_alive(), "EW car should be waiting"
+    t2.join(5)
+    assert not t2.is_alive(), "EW car didn't pass"
+    assert "EW" in passed
+    tl.stop()
+    print("test_traffic_light OK")
+
+
+if __name__ == "__main__":
+    test_singleton(); test_countdown_latch(); test_event_bus()
+    test_concurrent_hash_map(); test_async_logger(); test_traffic_light()
+    print("more_classics OK")
+```
+
+---
+
+## 5. Systems-style concurrency questions
+
+These are the "design a thread-safe X" questions that show up in onsite loops. They are not tied to numbered LeetCode problems, but each is a well-known interview and system-design staple (see [Sources](#7-sources)).
+
+### 5.1 Rate limiter (token bucket)
 
 **Trick:** don't run a timer thread. Store `(tokens, last_refill_time)` and **refill lazily** on each call using elapsed time. The refill + check + decrement must be one critical section. Inject the clock so it is testable.
 
@@ -1114,7 +1717,7 @@ class KeyedRateLimiter:
 
 Why token bucket over a fixed window: fixed windows allow a 2× burst across the boundary. Sliding-window log is exact but stores every timestamp (O(requests) memory).
 
-### 4.2 Thread-safe LRU cache (with single-flight loading)
+### 5.2 Thread-safe LRU cache (with single-flight loading)
 
 **Trick:** `OrderedDict` gives O(1) `move_to_end` / `popitem`. Even `get` **mutates** (recency order), so `get` needs the lock too. A frequent follow-up is the **cache stampede**: 100 threads miss the same key and all call the slow loader. Fix with *single-flight*: the first thread loads, the rest wait on an `Event` for that key. Never run the loader while holding the cache lock.
 
@@ -1171,7 +1774,63 @@ class LRUCache:
             return value
 ```
 
-### 4.3 Readers-writer lock (writer-preference)
+**Improvement: per-entry TTL expiration.** A common follow-up is "entries should expire after N seconds." Each entry stores `(value, expiry_time)`. `get` checks expiry lazily (on access). An optional background sweeper thread cleans expired entries to bound memory. Per-entry TTL overrides the default when provided.
+
+```python
+# file: systems.py
+class TTLCache:
+    """LRU cache with per-entry TTL. Expires lazily on access; optional
+    background sweeper to bound memory."""
+
+    def __init__(self, capacity, ttl, clock=time.monotonic, sweep_interval=None):
+        self._cap = capacity
+        self._ttl = ttl
+        self._clock = clock
+        self._d = OrderedDict()       # key -> (value, expiry_time)
+        self._lock = threading.Lock()
+        self._sweep_interval = sweep_interval
+        self._sweeper = None
+        if sweep_interval:
+            self._sweeper = threading.Thread(target=self._sweep_loop, daemon=True)
+            self._sweeper.start()
+
+    def get(self, key, default=None):
+        with self._lock:
+            entry = self._d.get(key)
+            if entry is None:
+                return default
+            value, expiry = entry
+            if self._clock() >= expiry:        # lazy expiration
+                del self._d[key]
+                return default
+            self._d.move_to_end(key)           # still a "use" for LRU
+            return value
+
+    def put(self, key, value, ttl=None):
+        with self._lock:
+            expiry = self._clock() + (ttl if ttl is not None else self._ttl)
+            self._d[key] = (value, expiry)
+            self._d.move_to_end(key)
+            if len(self._d) > self._cap:
+                self._d.popitem(last=False)
+
+    def _sweep_loop(self):
+        while True:
+            time.sleep(self._sweep_interval)
+            with self._lock:
+                now = self._clock()
+                expired = [k for k, (_, exp) in self._d.items() if now >= exp]
+                for k in expired:
+                    del self._d[k]
+
+    def size(self):
+        with self._lock:
+            return len(self._d)
+```
+
+Lazy expiration is O(1) per access and never wastes a background thread. The sweeper is optional and only needed when idle keys must be cleaned (e.g., a session cache where expired sessions should free memory even if nobody accesses them). The LRU eviction still works: when `put` overflows, the least-recently-used entry is evicted regardless of its TTL.
+
+### 5.3 Readers-writer lock (writer-preference)
 
 **Trick:** many readers **or** one writer. Naive reader-preference **starves writers** under continuous reads, so new readers must yield when a writer is waiting (`writers_waiting > 0`). One `Condition` guards three counters.
 
@@ -1229,7 +1888,7 @@ class RWLock:
             self.release_write()
 ```
 
-### 4.4 Thread pool / task executor
+### 5.4 Thread pool / task executor
 
 **Trick:** N workers loop on a `queue.Queue`; a **sentinel** (`None`) per worker is the shutdown signal. Return a `concurrent.futures.Future` so callers get results and exceptions. An uncaught exception must not kill a worker.
 
@@ -1274,7 +1933,7 @@ class ThreadPool:
 
 (In real code: `concurrent.futures.ThreadPoolExecutor`. Know what it does under the hood.)
 
-### 4.5 Delayed-task scheduler
+### 5.5 Delayed-task scheduler
 
 **Trick:** a **min-heap by due time** plus one worker that sleeps on a `Condition` **until the earliest due time or until a new, earlier task arrives**. `wait(timeout)` is exactly "sleep until due, but wake early if notified". Run the callback *outside* the lock so a slow task can't block `schedule()`.
 
@@ -1321,7 +1980,7 @@ class Scheduler:
             fn()                                              # outside the lock
 ```
 
-### 4.6 Tests for section 4
+### 5.6 Tests for section 5
 
 ```python
 # file: systems.py
@@ -1441,7 +2100,7 @@ if __name__ == "__main__":
 
 ---
 
-## 5. Rules of thumb for the interview
+## 6. Rules of thumb for the interview
 
 1. **Name the invariant first.** "This lock protects: free list + checked-out set." If you can't state it, you can't place the lock.
 2. **`Condition` + `wait_for(predicate)`.** Never `if not ready: wait()` (spurious wakeups, stolen wakeups). `notify()` only when all waiters on that condition are interchangeable; otherwise `notify_all()`.
@@ -1456,7 +2115,7 @@ if __name__ == "__main__":
 
 ---
 
-## 6. Sources
+## 7. Sources
 
 **Supplied by you (in your notes)**
 - Rippling phone screen, "KeyValue datastore with begin, commit and rollback": <https://leetcode.com/discuss/post/4985212/rippling-phonescreen-keyvalue-datastore-fi5hl/>
