@@ -1,19 +1,12 @@
 from collections import Counter
+import os
 
-def count_event_bytes(filename):
-    counts = Counter()
+def tail_backward(path, n):
+    if n == 0:
+        return []
 
-    with open(filename, "rb") as file:
-        for line in file:
-            line = line.rstrip(b"\r\n")
-
-            if not line:
-                continue
-
-            event_type = line.partition(b",")[0]
-            counts[event_type] += 1
-
-    return counts
+    with open(path, "rb") as f:
+        f.seek(0, os.SEEK_END)
 
 if __name__ == "__main__":
     counts = count_event_bytes("events.log")
