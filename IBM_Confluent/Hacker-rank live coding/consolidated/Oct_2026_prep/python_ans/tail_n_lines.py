@@ -13,6 +13,7 @@ Time O(K+B) K is the bytes of last n lines
 Space O(K+B)
 '''
 def tail_backward(path: str, n: int, block_size: int=8192) -> list[str]:
+    # block_size: int = 8192 specifies reading 8,192 bytes (or 8 KiB) at a time.
     if n <= 0:
         return []
 
